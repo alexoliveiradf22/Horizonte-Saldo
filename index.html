@@ -567,7 +567,7 @@ function moveDay(n){const d=parse(sel.k);if(sel.mode!=='dia'){d.setDate(1);d.set
 
 /* ---------- modal adicionar ---------- */
 function openModal(it,pre){
-  const base=pre||(sel?{k:today,c:sel.cats[0]}:{k:today,c:0});
+  const base=pre||(sel?{k:sel.mode==='dia'?sel.k:today,c:sel.cats[0]}:{k:today,c:0});
   F=it?{id:it.id,v:fmtV(it.value),cat:CK[it.cat],desc:it.desc||'',date:it.compra||it.date,card:it.card||null,venc:it.card?it.date:null,rep:it.rep||'nao',parcelas:it.parcelas||2,ate:it.ate||'infinito',vezes:it.vezes||2,tags:[...(it.tags||[])]}
     :{id:null,v:'',cat:base.c,desc:'',date:base.k,card:null,venc:null,rep:'nao',parcelas:2,ate:'infinito',vezes:2,tags:(sel&&sel.mode==='tag'&&!pre)?[sel.tag]:[]};
   $('#modal').classList.add('on');$('#mbox').classList.remove('tm','sm');renderModal();
