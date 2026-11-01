@@ -13,7 +13,7 @@ html,body{height:100%;margin:0}
 body{background:var(--bg);color:var(--fg);font:13px/1.3 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
 button{font:inherit;color:inherit;cursor:pointer}
 #app{display:flex;height:100%}
-#side{width:112px;flex:none;border-right:1px solid var(--line);padding:14px 0;display:flex;flex-direction:column;gap:2px}
+#side{width:128px;flex:none;border-right:1px solid var(--line);padding:14px 0;display:flex;flex-direction:column;gap:2px}
 #side .logo{margin:0 0 10px 14px;width:22px;height:18px;border-radius:5px;background:var(--brand)}
 #side a,#side button{display:flex;align-items:center;gap:10px;padding:9px 14px;border:0;background:none;text-align:left;border-left:3px solid transparent;font-weight:600;font-size:12px;text-decoration:none;color:inherit}
 #side .on{border-left-color:var(--brand);color:var(--brand)}
@@ -28,12 +28,12 @@ h1{font-size:16px;margin:0}
 .rng{border:1px solid var(--line);border-radius:18px;padding:6px 22px;font-weight:700}
 #scroll{flex:1;overflow:auto;display:flex;gap:16px;align-items:flex-start;padding:0 16px}
 .mes{flex:0 0 min(760px,calc(100vw - 150px))}
-.mes h3{margin:14px 0 8px;font-size:13px}
+.mes h3{position:sticky;top:0;z-index:4;background:var(--bg);margin:0;height:38px;padding:16px 0 0;font-size:13px}
 .box{border:1px solid var(--line);border-radius:12px}
 table{width:100%;border-collapse:separate;border-spacing:0;table-layout:fixed}
 th,td{height:32px;border-bottom:1px solid var(--line);border-right:1px solid var(--line);padding:0 10px;white-space:nowrap}
 th:last-child,td:last-child{border-right:0}
-thead th{position:sticky;top:0;z-index:2;background:var(--bg);border-bottom:2px solid var(--fg);font-weight:700;text-align:right}
+thead th{position:sticky;top:38px;z-index:2;background:var(--bg);border-bottom:2px solid var(--fg);font-weight:700;text-align:right}
 thead th:first-child,td.dia{width:44px;text-align:center}
 thead th i{margin-right:10px;vertical-align:middle}
 tfoot td{position:sticky;bottom:0;background:var(--bg);border-top:2px solid var(--fg);border-bottom:0;border-right:0;font-weight:700;text-align:right}
@@ -302,6 +302,8 @@ th.chd{width:120px}
 .row em{display:flex;align-items:center;gap:6px}
 .row em svg,.pill .f svg{width:15px;height:15px}
 .row .rs{margin-right:-4px}
+#side button,#side a,#side span{white-space:nowrap}
+tr.gh td.dia{cursor:default}
 @media (max-width:700px){#side{width:52px}#side span{display:none}#side a,#side button{padding:10px 0;justify-content:center}.rng{padding:6px 12px}}
 </style>
 </head>
@@ -442,7 +444,7 @@ th.chd{width:120px}
 /* ===== SERVIDOR (Google Apps Script) =====
    Cole aqui a URL do "app da web" publicado pelo Apps Script (termina em /exec).
    Vazio = modo local: contas e dados ficam só neste navegador. */
-const API_URL='https://script.google.com/macros/s/AKfycbyglyNIv3h_G425v5-a3GF2weQpQ9W7ozhYcwOurbeswdBjCESNi7WdrCoPQqfsvQOmzw/exec';
+const API_URL='https://script.google.com/macros/s/AKfycbyY8SZFUH6MY0_ZuvM4UxLDIgs1gPIuitiExVOwYGhSTRjzUEWPQ8KXbQewjbfI4Rni2g/exec';
 const REMOTE=!!API_URL;
 
 const CATS=[
@@ -524,6 +526,7 @@ function grid(){
         v.map((x,i)=>`<td class="c ${x?'':'z'}${S.cols&&S.cols[i]?' cc':''}" data-k="${k}" data-c="${i}"><i style="--c:${CATS[i].c}">${CATS[i].ic}</i><b>${brl(x)}</b></td>`).join('')+
         `<td class="s ${band(bal)}" data-k="${k}" data-c="all">${brl(bal)}</td></tr>`;
     }
+    for(let d=nd+1;d<=31;d++)rows+='<tr class="gh"><td class="dia"></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>';
     h+=`<section class="mes"><h3>${MESES[mo]} de ${y}</h3><div class="box"><table style="width:${TW()}px"${S.cols&&S.cols.length===5&&S.cols.every(Boolean)?' class="allc"':''}><thead><tr><th>dia</th>${CATS.map((c,i)=>`<th class="chd${S.cols&&S.cols[i]?' cc':''}" data-a="colt" data-i="${i}"><i style="--c:${c.c}">${c.ic}</i><span class="lb">${c.pl}</span></th>`).join('')}<th class="sd">saldos</th></tr></thead><tbody>${rows}</tbody><tfoot><tr><td></td>${tot.map((x,i)=>`<td class="tf${S.cols&&S.cols[i]?' cc':''}" data-k="${key(first)}" data-c="${i}" data-m="1"><i style="--c:${CATS[i].c};margin-right:10px;vertical-align:middle">${CATS[i].ic}</i>${brl(x)}</td>`).join('')}<td></td></tr></tfoot></table></div></section>`;
   }
   sc.innerHTML=h;sc.scrollLeft=sl;sc.scrollTop=st;
