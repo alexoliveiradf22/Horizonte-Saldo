@@ -26,14 +26,14 @@ h1{font-size:16px;margin:0}
 .nav{margin:0 auto;display:flex;align-items:center;gap:10px}
 .nav button{border:0;background:none;font-size:16px;padding:2px 6px}
 .rng{border:1px solid var(--line);border-radius:18px;padding:6px 22px;font-weight:700}
-#scroll{flex:1;overflow:auto;display:flex;gap:16px;align-items:flex-start;padding:0 16px}
+#scroll{flex:1;min-height:0;overflow-x:auto;overflow-y:hidden;display:flex;gap:16px;align-items:stretch;padding:0 16px}
 .mes{flex:0 0 min(760px,calc(100vw - 150px))}
-.mes h3{position:sticky;top:0;z-index:4;background:var(--bg);margin:0;height:38px;padding:16px 0 0;font-size:13px}
+.mes h3{margin:0;height:38px;padding:16px 0 0;font-size:13px;flex:none}
 .box{border:1px solid var(--line);border-radius:12px}
 table{width:100%;border-collapse:separate;border-spacing:0;table-layout:fixed}
 th,td{height:32px;border-bottom:1px solid var(--line);border-right:1px solid var(--line);padding:0 10px;white-space:nowrap}
 th:last-child,td:last-child{border-right:0}
-thead th{position:sticky;top:38px;z-index:2;background:var(--bg);border-bottom:2px solid var(--fg);font-weight:700;text-align:right}
+thead th{position:sticky;top:0;z-index:2;background:var(--bg);border-bottom:2px solid var(--fg);font-weight:700;text-align:right}
 thead th:first-child,td.dia{width:44px;text-align:center}
 thead th i{margin-right:10px;vertical-align:middle}
 tfoot td{position:sticky;bottom:0;background:var(--bg);border-top:2px solid var(--fg);border-bottom:0;border-right:0;font-weight:700;text-align:right}
@@ -285,8 +285,13 @@ td.tf.cc i{margin-right:0!important}
 .txtb{display:block;width:100%;margin-top:6px;border:0;background:none;font-weight:700;padding:10px}
 th.sd{width:116px}
 th.chd{width:120px}
-.mes{flex:0 0 auto}
-.mes .box{width:max-content}
+.mes{flex:0 0 auto;display:flex;flex-direction:column;min-height:0}
+.mes .box{width:max-content;flex:1;min-height:0;display:flex;flex-direction:column;overflow:hidden}
+.mbody{flex:1;min-height:0;overflow-y:auto;scrollbar-width:none;overscroll-behavior:contain}
+.mbody::-webkit-scrollbar{display:none}
+#sw{position:relative;flex:1;min-height:0;display:flex;flex-direction:column}
+#vs{position:absolute;right:0;top:0;bottom:15px;width:15px;overflow-y:scroll;overflow-x:hidden;z-index:6}
+#vsz{width:1px}
 .box table.allc{width:auto}
 .seg{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--line);font-weight:700;font-size:12px}
 .advb{display:block;padding:0 18px;border-bottom:0}
@@ -330,7 +335,7 @@ tr.gh td.dia{cursor:default}
           <button data-a="n1" aria-label="próximo mês">›</button><button data-a="n12" aria-label="12 meses depois">»</button>
         </div>
       </header>
-      <div id="scroll"></div>
+      <div id="sw"><div id="scroll"></div><div id="vs"><div id="vsz"></div></div></div>
     </section>
     <section class="view" id="v-totais" hidden>
       <header><h1>totais</h1><div class="nav"><button data-a="tmp" aria-label="mês anterior">‹</button><span class="tml"></span><button data-a="tmn" aria-label="próximo mês">›</button></div></header>
@@ -444,7 +449,7 @@ tr.gh td.dia{cursor:default}
 /* ===== SERVIDOR (Google Apps Script) =====
    Cole aqui a URL do "app da web" publicado pelo Apps Script (termina em /exec).
    Vazio = modo local: contas e dados ficam só neste navegador. */
-const API_URL='https://script.google.com/macros/s/AKfycbyY8SZFUH6MY0_ZuvM4UxLDIgs1gPIuitiExVOwYGhSTRjzUEWPQ8KXbQewjbfI4Rni2g/exec';
+const API_URL='https://script.google.com/macros/s/AKfycbz0-MrYYNkREGCZD47K9Y-PcOAe5P4FyCglSQE1muqmH_Ytu9V4M_2WoZ3bo7PSaVVwQw/exec';
 const REMOTE=!!API_URL;
 
 const CATS=[
@@ -514,7 +519,7 @@ function compute(st){
 
 const TW=()=>160+CATS.reduce((a,c,i)=>a+(S.cols&&S.cols[i]?38:120),0);
 function grid(){
-  const sc=$('#scroll'),sl=sc.scrollLeft,st=sc.scrollTop;
+  const sc=$('#scroll'),sl=sc.scrollLeft,st=($('#vs')||{}).scrollTop||0;
   compute();let bal=PRE,h='';
   for(let m=0;m<12;m++){
     const first=new Date(start.getFullYear(),start.getMonth()+m,1,12),y=first.getFullYear(),mo=first.getMonth(),nd=new Date(y,mo+1,0).getDate(),tot=[0,0,0,0,0];
@@ -526,10 +531,9 @@ function grid(){
         v.map((x,i)=>`<td class="c ${x?'':'z'}${S.cols&&S.cols[i]?' cc':''}" data-k="${k}" data-c="${i}"><i style="--c:${CATS[i].c}">${CATS[i].ic}</i><b>${brl(x)}</b></td>`).join('')+
         `<td class="s ${band(bal)}" data-k="${k}" data-c="all">${brl(bal)}</td></tr>`;
     }
-    for(let d=nd+1;d<=31;d++)rows+='<tr class="gh"><td class="dia"></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>';
-    h+=`<section class="mes"><h3>${MESES[mo]} de ${y}</h3><div class="box"><table style="width:${TW()}px"${S.cols&&S.cols.length===5&&S.cols.every(Boolean)?' class="allc"':''}><thead><tr><th>dia</th>${CATS.map((c,i)=>`<th class="chd${S.cols&&S.cols[i]?' cc':''}" data-a="colt" data-i="${i}"><i style="--c:${c.c}">${c.ic}</i><span class="lb">${c.pl}</span></th>`).join('')}<th class="sd">saldos</th></tr></thead><tbody>${rows}</tbody><tfoot><tr><td></td>${tot.map((x,i)=>`<td class="tf${S.cols&&S.cols[i]?' cc':''}" data-k="${key(first)}" data-c="${i}" data-m="1"><i style="--c:${CATS[i].c};margin-right:10px;vertical-align:middle">${CATS[i].ic}</i>${brl(x)}</td>`).join('')}<td></td></tr></tfoot></table></div></section>`;
+    h+=`<section class="mes"><h3>${MESES[mo]} de ${y}</h3><div class="box"><div class="mbody"><table style="width:${TW()}px"${S.cols&&S.cols.length===5&&S.cols.every(Boolean)?' class="allc"':''}><thead><tr><th>dia</th>${CATS.map((c,i)=>`<th class="chd${S.cols&&S.cols[i]?' cc':''}" data-a="colt" data-i="${i}"><i style="--c:${c.c}">${c.ic}</i><span class="lb">${c.pl}</span></th>`).join('')}<th class="sd">saldos</th></tr></thead><tbody>${rows}</tbody><tfoot><tr><td></td>${tot.map((x,i)=>`<td class="tf${S.cols&&S.cols[i]?' cc':''}" data-k="${key(first)}" data-c="${i}" data-m="1"><i style="--c:${CATS[i].c};margin-right:10px;vertical-align:middle">${CATS[i].ic}</i>${brl(x)}</td>`).join('')}<td></td></tr></tfoot></table></div></div></section>`;
   }
-  sc.innerHTML=h;sc.scrollLeft=sl;sc.scrollTop=st;
+  sc.innerHTML=h;sc.scrollLeft=sl;setupScroll(st);
   const e=new Date(start.getFullYear(),start.getMonth()+11,1);
   $('#rng').textContent=AB[start.getMonth()]+'/'+start.getFullYear()+' - '+AB[e.getMonth()]+'/'+e.getFullYear();
 }
@@ -918,6 +922,24 @@ function restoreFrom(txt){
   catch(e){toast('backup inválido')}}
 document.addEventListener('change',e=>{if(e.target.id==='bkin'){const f=e.target.files[0];e.target.value='';if(f)f.text().then(restoreFrom)}});
 if(REMOTE)bootRemote();else if(lsGet(SK)==='1'&&getAcc())hideAuth();else showAuth(getAcc()?'entrar':'cadastrar');
+
+
+/* ---------- rolagem sincronizada: cada mês trava na sua última data ---------- */
+let SY=false;
+function setupScroll(st){
+  const bs=[...document.querySelectorAll('.mbody')],vs=$('#vs');if(!vs)return;
+  const mx=Math.max(0,...bs.map(b=>b.scrollHeight-b.clientHeight));
+  $('#vsz').style.height=(vs.clientHeight+mx)+'px';vs.style.visibility=mx>0?'visible':'hidden';
+  SY=true;bs.forEach(b=>b.scrollTop=st||0);vs.scrollTop=st||0;requestAnimationFrame(()=>{SY=false})}
+function syncFrom(src){
+  if(SY)return;SY=true;const t=src.scrollTop;
+  document.querySelectorAll('.mbody').forEach(b=>{if(b!==src)b.scrollTop=t});
+  const vs=$('#vs');if(vs&&vs!==src)vs.scrollTop=t;
+  requestAnimationFrame(()=>{SY=false})}
+$('#scroll').addEventListener('scroll',e=>{if(e.target.classList&&e.target.classList.contains('mbody'))syncFrom(e.target)},true);
+$('#vs').addEventListener('scroll',e=>syncFrom(e.target));
+$('#scroll').addEventListener('wheel',e=>{const m=e.target.closest('.mes');if(m&&!e.target.closest('.mbody')){const b=m.querySelector('.mbody');if(b)b.scrollTop+=e.deltaY}},{passive:true});
+window.addEventListener('resize',()=>{if(view==='saldos')setupScroll(($('#vs')||{}).scrollTop||0)});
 
 grid();
 const t0=document.querySelector('td.hoje');if(t0)t0.scrollIntoView({block:'center'});
