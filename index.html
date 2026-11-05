@@ -337,6 +337,11 @@ td.c.cc:hover i::after{content:'+';font-size:16px;font-weight:700;color:#777}
 .sheet.pk{left:16px;right:16px;top:70px;padding:0 16px 16px}
 .pk .mh{margin:0 -16px;padding:14px 16px 10px;border-bottom:0}
 .obtn{display:block;width:100%;margin-top:10px;padding:10px;border:1px solid var(--fg);border-radius:22px;background:none;color:var(--fg);font-weight:700;font-size:12px}
+.rngw{position:relative;display:inline-block}
+.nav button.rng{border:1px solid var(--line);border-radius:18px;padding:6px 14px 6px 22px;font:inherit;font-weight:700;display:inline-flex;align-items:center;gap:6px;color:inherit;cursor:pointer}
+.rng .rc svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;display:block}
+#rngmenu{position:absolute;top:calc(100% + 6px);left:50%;transform:translateX(-50%);width:210px;background:var(--bg);border:1px solid var(--line);border-radius:12px;box-shadow:0 8px 28px rgba(0,0,0,.2);z-index:30;overflow:hidden;text-align:left}
+#rngmenu[hidden]{display:none}
 @media (max-width:700px){#side{width:52px}#side span{display:none}#side a,#side button{padding:10px 0;justify-content:center}.rng{padding:6px 12px}}
 </style>
 </head>
@@ -359,7 +364,7 @@ td.c.cc:hover i::after{content:'+';font-size:16px;font-weight:700;color:#777}
       <header><h1>saldos</h1>
         <div class="nav">
           <button data-a="p12" aria-label="12 meses antes">«</button><button data-a="p1" aria-label="mês anterior">‹</button>
-          <span class="rng" id="rng"></span>
+          <span class="rngw"><button class="rng" id="rng" data-a="rngm"></button><div id="rngmenu" hidden></div></span>
           <button data-a="n1" aria-label="próximo mês">›</button><button data-a="n12" aria-label="12 meses depois">»</button>
         </div>
       </header>
@@ -481,7 +486,7 @@ td.c.cc:hover i::after{content:'+';font-size:16px;font-weight:700;color:#777}
 /* ===== SERVIDOR (Google Apps Script) =====
    Cole aqui a URL do "app da web" publicado pelo Apps Script (termina em /exec).
    Vazio = modo local: contas e dados ficam só neste navegador. */
-const API_URL='https://script.google.com/macros/s/AKfycbzm_IxeTW-9uH_cOLDb1StVOSBeVPIx3fcluzTbXsYddx4SH3iH4qT1_NDN77s70OLl/exec';
+const API_URL='https://script.google.com/macros/s/AKfycbwZBLWGLbXuivB3ErVyxl9NlY3jcEATBifSqq5EeP4199zeMaxWNGnuOiqYRPRalS6mPw/exec';
 const REMOTE=!!API_URL;
 
 const CATS=[
@@ -570,7 +575,7 @@ function grid(){
   }
   sc.innerHTML=h;sc.scrollLeft=sl;setupScroll(st);
   const e=new Date(start.getFullYear(),start.getMonth()+11,1);
-  $('#rng').textContent=AB[start.getMonth()]+'/'+start.getFullYear()+' - '+AB[e.getMonth()]+'/'+e.getFullYear();
+  $('#rng').innerHTML=AB[start.getMonth()]+'/'+start.getFullYear()+' - '+AB[e.getMonth()]+'/'+e.getFullYear()+'<span class="rc">'+IC.chev+'</span>';
 }
 
 /* ---------- painel lateral ---------- */
@@ -669,7 +674,7 @@ function saveItem(){
 /* ---------- eventos ---------- */
 document.addEventListener('input',e=>{if(e.target.id==='tsearch'){renderTags();return}if(e.target.id==='gv'){GF.v=maskMoney(e.target);return}if(e.target.id==='gd'){GF.d=e.target.value;return}if(e.target.id==='cfn'){CF.n=e.target.value;return}if(e.target.id==='cfc'){CF.c=e.target.value;return}if(e.target.id==='cfv'){CF.v=e.target.value;return}if(e.target.id==='ntn'){NT.n=e.target.value;return}if(!F)return;if(e.target.id==='tf'){TF=e.target.value;$('#tl').innerHTML=tagList()}if(e.target.id==='fv')F.v=maskMoney(e.target);if(e.target.id==='fd')F.desc=e.target.value;const l=$('#stl');if(l)l.textContent=stTxt()});
 document.addEventListener('click',e=>{
-  const mn=$('#menu');if(!e.target.closest('[data-a="kb"],[data-a="tkb"],[data-a="ckb"],[data-a="gkb"]'))mn.style.display='none';if(!e.target.closest('#addmenu')&&!e.target.closest('[data-a="addmenu"]'))$('#addmenu').style.display='none';{const dm=$('#divmenu');if(dm&&!e.target.closest('#divmenu')&&!e.target.closest('[data-a="pdivtog"]'))dm.hidden=true}if(!e.target.closest('#fmenu')&&!e.target.closest('#pill'))closeFmenu();
+  const mn=$('#menu');if(!e.target.closest('[data-a="kb"],[data-a="tkb"],[data-a="ckb"],[data-a="gkb"]'))mn.style.display='none';if(!e.target.closest('#addmenu')&&!e.target.closest('[data-a="addmenu"]'))$('#addmenu').style.display='none';{const rm=$('#rngmenu');if(rm&&!e.target.closest('#rngmenu')&&!e.target.closest('[data-a="rngm"]'))rm.hidden=true}{const dm=$('#divmenu');if(dm&&!e.target.closest('#divmenu')&&!e.target.closest('[data-a="pdivtog"]'))dm.hidden=true}if(!e.target.closest('#fmenu')&&!e.target.closest('#pill'))closeFmenu();
   const td=e.target.closest('td[data-k]');if(td&&td.classList.contains('cc')&&!td.dataset.m){openModal(null,{k:td.dataset.k,c:+td.dataset.c});return}if(td){openPanel(td.dataset.k,td.dataset.c==='all'?ALL:[+td.dataset.c],td.dataset.m?'mes':'dia');return}
   if(e.target.id==='mbox'&&!$('#sheet').hidden){closeSheet();return}
   if(e.target.id==='modal'){closeModal();return}
@@ -678,7 +683,7 @@ document.addEventListener('click',e=>{
     add:()=>openModal(),pclose:closePanel,pprev:()=>moveDay(-1),pnext:()=>moveDay(1),mclose:closeModal,save:saveItem,shclose:()=>{closeSheet();renderModal()},
     p1:()=>{start.setMonth(start.getMonth()-1);grid();$('#scroll').scrollLeft=0},n1:()=>{start.setMonth(start.getMonth()+1);grid();$('#scroll').scrollLeft=0},
     p12:()=>{start.setMonth(start.getMonth()-12);grid();$('#scroll').scrollLeft=0},n12:()=>{start.setMonth(start.getMonth()+12);grid();$('#scroll').scrollLeft=0},
-    hoje:()=>{const n=new Date();start=new Date(n.getFullYear(),n.getMonth(),1,12);TM=new Date(start);
+    hoje:()=>{const n=new Date();startFor();TM=new Date(n.getFullYear(),n.getMonth(),1,12);
       TY=n.getFullYear();
       setView('saldos');$('#scroll').scrollLeft=0;scrollHoje()},
     soon:()=>toast('em breve'),
@@ -717,6 +722,10 @@ document.addEventListener('click',e=>{
     detdel:()=>askDel(DT.id,DT.k,true),
     chpick:()=>{const f=CH;CH=null;if(!F)closeModal();if(f)f(D.k)},
     chno:()=>{CH=null;if(F)closeSheet();else closeModal()},
+    rngm:()=>{const m=$('#rngmenu');if(!m.hidden){m.hidden=true;return}
+      const R=[['atual','mês atual + 11 meses'],['anterior','mês anterior + 11 meses'],['ano','ano atual']];
+      m.innerHTML='<p class="dmh">mostrar</p>'+R.map(([k,l])=>`<button class="dmi" data-a="rngset" data-k="${k}"><span>${l}</span>${(S.range||'atual')===k?'<u>✓</u>':''}</button>`).join('');m.hidden=false},
+    rngset:()=>{S.range=D.k;save();startFor();$('#rngmenu').hidden=true;grid();$('#scroll').scrollLeft=0},
     mark:()=>{S.marks=S.marks||{};if(S.marks[D.d])delete S.marks[D.d];else S.marks[D.d]=1;save();b.classList.toggle('mk')},
     colt:()=>{S.cols=S.cols||[0,0,0,0,0];S.cols[+D.i]=S.cols[+D.i]?0:1;save();grid()},
     tcard:()=>{TD=D.t;TY=TM.getFullYear();setView('totdet')},
@@ -1031,7 +1040,8 @@ function askChoice(title,msg,opts,fn,danger){
 
 /* ---------- rolagem sincronizada: cada mês trava na sua última data ---------- */
 let SY=false;
-function scrollHoje(){const t=document.querySelector('#scroll td.hoje');if(!t)return;const b=t.closest('.mbody');if(!b)return;const r=t.getBoundingClientRect(),br=b.getBoundingClientRect();b.scrollTop+=(r.top-br.top)-(b.clientHeight-r.height)/2}
+function startFor(){const n=new Date(),r=S.range||'atual';start=r==='ano'?new Date(n.getFullYear(),0,1,12):new Date(n.getFullYear(),n.getMonth()+(r==='anterior'?-1:0),1,12)}
+function scrollHoje(){const t=document.querySelector('#scroll td.hoje');if(!t)return;const b=t.closest('.mbody');if(!b)return;const r=t.getBoundingClientRect(),br=b.getBoundingClientRect();b.scrollTop+=(r.top-br.top)-(b.clientHeight-r.height)/2;const m=t.closest('.mes'),sc=$('#scroll');if(m)sc.scrollLeft+=m.getBoundingClientRect().left-sc.getBoundingClientRect().left-16}
 function setupScroll(st){
   const bs=[...document.querySelectorAll('.mbody')],vs=$('#vs');if(!vs)return;
   const mx=Math.max(0,...bs.map(b=>b.scrollHeight-b.clientHeight));
@@ -1047,7 +1057,7 @@ $('#vs').addEventListener('scroll',e=>syncFrom(e.target));
 $('#scroll').addEventListener('wheel',e=>{const m=e.target.closest('.mes');if(m&&!e.target.closest('.mbody')){const b=m.querySelector('.mbody');if(b)b.scrollTop+=e.deltaY}},{passive:true});
 window.addEventListener('resize',()=>{if(view==='saldos')setupScroll(($('#vs')||{}).scrollTop||0)});
 
-grid();
+startFor();grid();
 scrollHoje();
 </script>
 </body>
