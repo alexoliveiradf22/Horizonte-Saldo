@@ -355,7 +355,7 @@ td.c.cc:hover i::after{content:'+';font-size:16px;font-weight:700;color:#777}
     <button data-a="v" data-v="menu"><b><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h10"/></svg></b><span>menu</span></button>
     <hr>
     <button data-a="addmenu"><b class="blk">+</b><span>adicionar</span></button>
-    <button data-a="hoje"><b><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4.5" width="18" height="16" rx="3"/><path d="M3 9.5h18M8 3v3M16 3v3"/><text id="hd" x="12" y="18" text-anchor="middle" font-size="10" font-weight="700" fill="currentColor" stroke="none">31</text></svg></b><span>ir pra hoje</span></button>
+    <button data-a="hoje"><b><svg viewBox="0 0 34 34" aria-hidden="true" style="stroke:none"><rect y="3" width="34" height="31" rx="5" fill="#e3e5ea"/><path d="M0 8a5 5 0 0 1 5-5h24a5 5 0 0 1 5 5v3H0z" fill="#ee6a35"/><rect x="8" y="0" width="4" height="7" rx="1.6" fill="#222"/><rect x="22" y="0" width="4" height="7" rx="1.6" fill="#222"/><text id="hd" x="17" y="28" text-anchor="middle" font-size="15" font-weight="700" fill="#222">31</text></svg></b><span>ir pra hoje</span></button>
     <button data-a="v" data-v="horizonte"><b><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="18" height="4" rx="1.5" fill="#f3d58a" stroke="none"/><rect x="3" y="10" width="18" height="4" rx="1.5" fill="#f3d58a" stroke="none"/><rect x="3" y="16" width="18" height="4" rx="1.5" fill="#f3d58a" stroke="none"/></svg></b><span>horizonte</span></button>
     <button class="colp" data-a="collapse" aria-label="recolher menu"><b>‹</b></button>
   </nav>
@@ -486,7 +486,7 @@ td.c.cc:hover i::after{content:'+';font-size:16px;font-weight:700;color:#777}
 /* ===== SERVIDOR (Google Apps Script) =====
    Cole aqui a URL do "app da web" publicado pelo Apps Script (termina em /exec).
    Vazio = modo local: contas e dados ficam só neste navegador. */
-const API_URL='https://script.google.com/macros/s/AKfycbwZBLWGLbXuivB3ErVyxl9NlY3jcEATBifSqq5EeP4199zeMaxWNGnuOiqYRPRalS6mPw/exec';
+const API_URL='https://script.google.com/macros/s/AKfycbwXtjPGWh2imY_uvqRGOBPl4Z_anTPc37xQkxQX27ROJV8U_GTw6GQQJk9aM5b9VO5T-g/exec';
 const REMOTE=!!API_URL;
 
 const CATS=[
@@ -627,7 +627,7 @@ function renderModal(){
   <button class="row" data-a="sh-cat"><i style="--c:${c.c}">${c.ic}</i><span>${c.sg}</span><em>${IC.chev}</em></button>
   <div class="row"><b class="g">${IC.pencil}</b><input id="fd" placeholder="${c.sg}" value="${esc(F.desc)}" autocomplete="off"></div>
   ${cardRow()}
-  ${F.cat===4?'':`<button class="row" data-a="sh-date"><b class="g">${IC.cal}</b><span>data</span><em>${(()=>{const d=parse(F.date);return pad(d.getDate())+'/'+pad(d.getMonth()+1)+'/'+String(d.getFullYear()).slice(2)})()} ${IC.chev}</em></button>`}
+  ${F.cat===4&&!F.id?'':`<button class="row" data-a="sh-date"><b class="g">${IC.cal}</b><span>data</span><em>${(()=>{const d=parse(F.date);return pad(d.getDate())+'/'+pad(d.getMonth()+1)+'/'+String(d.getFullYear()).slice(2)})()} ${IC.chev}</em></button>`}
   ${vencRow()}${F.id?'':`<button class="row" data-a="sh-rep"><b class="g">${IC.calrep}</b><span>${REP[F.rep][0]}</span><em>${IC.chev}</em></button>`}
   ${!F.id&&['mensal','semanal','diario'].includes(F.rep)?`<button class="row" data-a="sh-ate"><b class="g">${IC.undo}</b><span>${F.ate==='vezes'?'número de vezes':'a perder de vista'}</span><em>${IC.chev}</em></button>`:''}
   ${!F.id&&(F.rep==='parcelado'||(F.rep!=='nao'&&F.ate==='vezes'))?stepRow():''}
@@ -659,7 +659,7 @@ function saveItem(){
   if(!(v>0)){$('#fv').focus();$('#fv').placeholder='informe o valor';return}
   const cardOn=F.cat===4&&F.card&&cardOf(F.card)&&F.venc;
   if(F.id){
-    const f={value:Math.round(v*100)/100,cat:CATS[F.cat].k,desc:F.desc.trim(),tags:[...F.tags],date:cardOn?F.venc:F.date,compra:cardOn?F.date:'',card:cardOn?F.card:null};
+    const f={value:Math.round(v*100)/100,cat:CATS[F.cat].k,desc:F.desc.trim(),tags:[...F.tags],date:F.date,compra:'',card:F.cat===4?F.card:null};
     const it=S.items.find(x=>x.id===F.id),k=F.occK||0;
     if(!it){closeModal();return}
     const fin=m=>{applyEdit(it,k,m,f);save();closeModal();toast('movimentações salvas!');refresh()};
@@ -862,7 +862,7 @@ function dueDate(k,c){
   return key(new Date(y2,m2,Math.min(c.v,dim(y2,m2)),12))}
 function recomputeVenc(){const c=cardOf(F.card);F.venc=c?dueDate(F.date,c):null}
 function cardRow(){if(F.cat!==4)return '';const c=cardOf(F.card);return `<button class="row" data-a="sh-card"><b class="g">${IC.card}</b><span>${c?esc(c.n):'escolha um cartão'}</span><em>${IC.chev}</em></button>`}
-function vencRow(){if(F.cat!==4||!F.card||!F.venc)return '';const d=parse(F.venc);return `<button class="row" data-a="sh-venc"><b class="g">${IC.cal}</b><span>vencimento</span><em>${pad(d.getDate())}/${pad(d.getMonth()+1)}/${String(d.getFullYear()).slice(2)} ${IC.chev}</em></button>`}
+function vencRow(){if(F.cat!==4||!F.card||!F.venc||F.id)return '';const d=parse(F.venc);return `<button class="row" data-a="sh-venc"><b class="g">${IC.cal}</b><span>vencimento</span><em>${pad(d.getDate())}/${pad(d.getMonth()+1)}/${String(d.getFullYear()).slice(2)} ${IC.chev}</em></button>`}
 function mname(){$('#mname').textContent=(S.profile.nome||'').trim()||'usuário'}
 function fillPerfil(){$('#pemail').value=REMOTE?((ACC&&ACC.email)||''):((getAcc()||{}).email||'');$('#pnome').value=S.profile.nome||'';$('#psob').value=S.profile.sobrenome||'';$('#pw1').value='';$('#pw2').value=''}
 function renderCartoes(){
@@ -1005,7 +1005,7 @@ function renderDet(){
 function openEdit(id,k,date){
   const it=S.items.find(x=>x.id===id);if(!it)return;
   const e=effOcc(it,k),t=it.rep||'nao';
-  F={id:it.id,occK:k,v:fmtV(t==='parcelado'?it.value:e.value),cat:CK[e.cat],desc:e.desc||'',date:(it.compra&&k===0)?it.compra:e.date,card:it.card||null,venc:it.card?e.date:null,rep:t,parcelas:it.parcelas||2,ate:it.ate||'infinito',vezes:it.vezes||2,tags:[...e.tags]};
+  F={id:it.id,occK:k,v:fmtV(t==='parcelado'?it.value:e.value),cat:CK[e.cat],desc:e.desc||'',date:e.date,card:it.card||null,venc:null,rep:t,parcelas:it.parcelas||2,ate:it.ate||'infinito',vezes:it.vezes||2,tags:[...e.tags]};
   $('#modal').classList.add('on');$('#mbox').classList.remove('tm','sm');renderModal();{const fi=$('#fv');if(fi){fi.focus();if(fi.select)fi.select()}}}
 function truncate(it,k){
   if(it.rep==='parcelado'){it.value=Math.round(it.value/Math.max(1,it.parcelas|0)*k*100)/100;it.parcelas=k}
