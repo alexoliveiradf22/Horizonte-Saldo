@@ -475,6 +475,14 @@ body.mob #mbox:not(.sm):not(.tm)>.go{width:calc(100% - 48px);margin:34px 24px 0;
 body.mob #mbox:not(.sm):not(.tm)>.txtb{font-size:19px;margin-top:16px}
 body.mob #mbox .sheet{position:fixed;left:12px;right:12px;top:auto;bottom:calc(12px + env(safe-area-inset-bottom,0px));max-height:80%;font-size:16px}
 body.mob #mbox .sheet.pk{top:auto}
+.hzs{overflow:auto!important;touch-action:auto!important;scroll-snap-type:x mandatory}
+.hzpg{align-items:flex-start;min-height:auto!important}
+.hzc{flex:1 1 0}
+.hzm{position:sticky;top:0;z-index:2;background:var(--bg);padding:12px 0!important;font-size:15px!important}
+.hzm.cur{background:var(--fg)}
+.hzr{flex:none!important;height:40px;font-size:15px!important}
+.hzr .hv{padding-right:10px!important;font-weight:500!important}
+#v-horizonte header .hzadd{margin-left:auto;border:0;background:none;font-size:30px;line-height:1;padding:0 4px}
 .mdots,.hzpgn{display:none!important}
 .ttb svg{width:22px;height:22px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;display:block}
 .tc{width:20px!important;height:13px!important;border-radius:2px 0 0 2px!important;clip-path:polygon(0 0,72% 0,100% 50%,72% 100%,0 100%)}
@@ -666,7 +674,7 @@ body.mob #acard{width:min(360px,100%);font-size:16px;padding:28px 26px 22px}body
       <div class="page"><div class="col" id="detc" style="max-width:262px"></div></div>
     </section>
     <section class="view" id="v-horizonte" hidden>
-      <header><h1><button class="bk mo" data-a="v" data-v="saldos" aria-label="voltar">←</button>horizonte de saldos</h1></header>
+      <header><h1><button class="bk mo" data-a="v" data-v="saldos" aria-label="voltar">←</button>horizonte de saldos</h1><button class="hzadd mo" data-a="addmenu" aria-label="adicionar">+</button></header>
       <div id="hz"></div>
     </section>
   </main>
