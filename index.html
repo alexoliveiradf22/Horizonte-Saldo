@@ -475,6 +475,9 @@ body.mob #mbox:not(.sm):not(.tm)>.go{width:calc(100% - 48px);margin:34px 24px 0;
 body.mob #mbox:not(.sm):not(.tm)>.txtb{font-size:19px;margin-top:16px}
 body.mob #mbox .sheet{position:fixed;left:12px;right:12px;top:auto;bottom:calc(12px + env(safe-area-inset-bottom,0px));max-height:80%;font-size:16px}
 body.mob #mbox .sheet.pk{top:auto}
+body.mob #hz{overflow-x:hidden!important;overflow-y:auto!important;display:block!important;touch-action:pan-y;-webkit-overflow-scrolling:touch;overscroll-behavior:contain}
+body.mob #hz .hzpg{display:flex;width:100%}
+.hzpg.swl{animation:swl .2s ease-out}.hzpg.swr{animation:swr .2s ease-out}
 .hzs{overflow:auto!important;touch-action:auto!important;scroll-snap-type:x mandatory}
 .hzpg{align-items:flex-start;min-height:auto!important}
 .hzc{flex:1 1 0}
@@ -1374,14 +1377,18 @@ function dmVal(y,m){const ym=y+'-'+pad(m+1),dias=new Date(y,m+1,0).getDate(),cur
   Object.keys(DAY).forEach(k=>{if(k.slice(0,7)===ym&&(!cur||k<=today))s+=DAY[k][2]-((X[k]||[])[2]||0)});
   const dv=cur?+today.slice(8,10):dias;return {s,dv,v:dv?s/dv:0}}
 /* horizonte no celular: 3 meses fixos por tela, deslizando passa para os próximos 3 */
-function renderHzM(cols){
-  const old=$('#hz .hzs'),sl=old?old.scrollLeft:0;let h='<div class="hzs">';
-  for(let p=0;p<cols.length;p+=3){h+='<div class="hzpg">'+cols.slice(p,p+3).map(c=>`<div class="hzc"><div class="hzm ${c.cur?'cur':''}">${c.lbl}</div>`+Array.from({length:31},(_,i)=>{const o=c.arr[i];
-    return o?`<div class="hzr"><span class="hd ${o.k===today?'hoje':o.wk?'wk':''}">${o.d}</span><span class="hv ${band(o.bal)}" data-a="hzday" data-k="${o.k}">${fmtK(o.bal)}</span></div>`:'<div class="hzr x"><span></span><span></span></div>'}).join('')+'</div>').join('')+'</div>'}
-  const np=Math.ceil(cols.length/3);
-  h+='</div><div class="hzpgn">'+Array.from({length:np},(_,i)=>`<i class="${i?'':'on'}"></i>`).join('')+'</div>';
-  $('#hz').innerHTML=h;const s=$('#hz .hzs');s.scrollLeft=sl;hzDots();s.addEventListener('scroll',hzDots,{passive:true})}
-function hzDots(){const s=$('#hz .hzs');if(!s)return;const i=Math.round(s.scrollLeft/Math.max(1,s.clientWidth));document.querySelectorAll('#hz .hzpgn i').forEach((e,k)=>e.classList.toggle('on',k===i))}
+var HZC=[],HZP=0;
+function renderHzM(cols){HZC=cols;HZP=Math.max(0,Math.min(HZP,Math.ceil(cols.length/3)-1));hzPage(0)}
+function hzPage(dir){
+  const box=$('#hz'),st=box.scrollTop;
+  const h='<div class="hzpg'+(dir>0?' swl':dir<0?' swr':'')+'">'+HZC.slice(HZP*3,HZP*3+3).map(c=>`<div class="hzc"><div class="hzm ${c.cur?'cur':''}">${c.lbl}</div>`+Array.from({length:31},(_,i)=>{const o=c.arr[i];
+    return o?`<div class="hzr"><span class="hd ${o.k===today?'hoje':o.wk?'wk':''}">${o.d}</span><span class="hv ${band(o.bal)}" data-a="hzday" data-k="${o.k}">${fmtK(o.bal)}</span></div>`:'<div class="hzr x"><span></span><span></span></div>'}).join('')+'</div>').join('')+'</div>';
+  box.innerHTML=h;box.scrollTop=st}
+(function(){let x0=null,y0=0,t0=0;const B=document.getElementById('hz');if(!B)return;
+  B.addEventListener('touchstart',e=>{if(!MOB||e.touches.length!==1){x0=null;return}x0=e.touches[0].clientX;y0=e.touches[0].clientY;t0=Date.now()},{passive:true});
+  B.addEventListener('touchend',e=>{if(x0===null)return;const t=e.changedTouches[0],dx=t.clientX-x0,dy=t.clientY-y0;x0=null;
+    if(Math.abs(dx)>50&&Math.abs(dx)>Math.abs(dy)*1.5&&Date.now()-t0<800){const n=Math.ceil(HZC.length/3),p=Math.max(0,Math.min(n-1,HZP+(dx<0?1:-1)));if(p!==HZP){const d=p>HZP?1:-1;HZP=p;hzPage(d)}}},{passive:true});
+})();
 MACT.hzday=(b,D)=>openPanel(D.k,ALL,'dia');
 
 /* virada do dia: à meia-noite a previsão de hoje sai e fica só o que foi lançado */
