@@ -475,8 +475,6 @@ body.mob #mbox:not(.sm):not(.tm)>.go{width:calc(100% - 48px);margin:34px 24px 0;
 body.mob #mbox:not(.sm):not(.tm)>.txtb{font-size:19px;margin-top:16px}
 body.mob #mbox .sheet{position:fixed;left:12px;right:12px;top:auto;bottom:calc(12px + env(safe-area-inset-bottom,0px));max-height:80%;font-size:16px}
 body.mob #mbox .sheet.pk{top:auto}
-#toast{max-width:calc(100% - 32px);text-align:center}
-#toast{max-width:min(92vw,420px);width:max-content;text-align:center;line-height:1.35}
 .rcode{font-size:40px;font-weight:700;letter-spacing:8px;text-align:center;margin:18px 0 6px;font-variant-numeric:tabular-nums}
 #mbox .rnote{color:var(--mut);line-height:1.5;margin:8px 0 0;font-size:13px}
 body.mob #mbox .rnote{font-size:16px}
@@ -714,8 +712,7 @@ body.mob #acard{width:min(360px,100%);font-size:16px;padding:28px 26px 22px}body
    Cole aqui a URL do "app da web" publicado pelo Apps Script (termina em /exec).
    Vazio = modo local: contas e dados ficam só neste navegador. */
 const API_URL='https://script.google.com/macros/library/d/1WSTxpiuHMKH8703OWr6jtbZUsjfdx9NCFdMsFq5e77caGy6xE60NX5Sc/11';
-const IN_GAS=!!(window.google&&google.script&&google.script.run);
-const REMOTE=IN_GAS||!!API_URL;
+const REMOTE=!!API_URL;
 
 const CATS=[
  {k:'entrada',pl:'entradas',sg:'entrada',ic:'↙',c:'#2f9e5b',sign:1},
@@ -1081,7 +1078,7 @@ function renderHz(){
 
 /* ---------- cartões, perfil, aviso ---------- */
 let CF={id:null,n:'',c:'',v:''},VT=null,tt;
-function toast(m){const e=$('#toast');e.textContent=m;e.classList.add('on');clearTimeout(tt);tt=setTimeout(()=>e.classList.remove('on'),Math.max(2200,String(m).length*65))}
+function toast(m){const e=$('#toast');e.textContent=m;e.classList.add('on');clearTimeout(tt);tt=setTimeout(()=>e.classList.remove('on'),2200)}
 function cardOf(id){return id?S.cards.find(c=>c.id===id):null}
 // vencimento da fatura: fecha no mês da compra se o dia for até o fechamento; vence no mês seguinte ao fechamento quando o dia de vencimento não vem depois do fechamento
 function dueDate(k,c){
@@ -1149,7 +1146,6 @@ const getAcc=()=>{try{return JSON.parse(lsGet(AK))}catch(e){return null}};
 const TK='horizonte.token';
 let ACC=null,TOKEN=lsGet(TK),HASACC=false,pt=null,pending=false;
 async function api(action,payload){
-  if(IN_GAS)return new Promise(res=>google.script.run.withSuccessHandler(r=>res(r||{ok:false,erro:'sem resposta do servidor'})).withFailureHandler(()=>res({ok:false,erro:'sem conexão com o servidor'})).api(Object.assign({action},payload||{})));
   try{const r=await fetch(API_URL,{method:'POST',body:JSON.stringify({action,...(payload||{})})});return await r.json()}
   catch(e){return {ok:false,erro:'sem conexão com o servidor'}}}
 function pushRemote(){
@@ -1158,10 +1154,10 @@ function pushRemote(){
   pt=setTimeout(async()=>{const r=await api('save',{token:TOKEN,data:JSON.stringify(S)});pending=false;if(r&&r.erro==='sessao')doLogout('sessão expirada. entre novamente');else if(r&&!r.ok)toast('não foi possível sincronizar')},700)}
 function applyRemote(r){
   ACC=r.perfil;
-  {let d=null;try{d=r.data?JSON.parse(r.data):null}catch(e){}useData(d)}
+  if(r.data){try{Object.assign(S,JSON.parse(r.data))}catch(e){}}
   S.tags=(S.tags||[]).map(t=>typeof t==='string'?{n:t,c:'cinza'}:t);
   S.profile={nome:ACC.nome||'',sobrenome:ACC.sobrenome||''};
-  applyTheme();mname();memail();refresh();if(typeof recCheck==='function')setTimeout(recCheck,400)}
+  applyTheme();mname();memail();refresh()}
 async function pullRemote(){
   if(!REMOTE||!TOKEN||pending)return;const r=await api('load',{token:TOKEN});
   if(r.ok)applyRemote(r);else if(r.erro==='sessao')doLogout('sessão expirada. entre novamente')}
@@ -1182,7 +1178,7 @@ function renderConfig(){
 function memail(){const a=REMOTE?ACC:getAcc();$('#memail').textContent=a?a.email:''}
 function showAuth(m){AM=m;$('#auth').style.display='flex';$('#acard').style.display='';renderAuth()}
 function hideAuth(){$('#auth').style.display='none'}
-function renderAuth(){if(AM!=='carregando'){renderAuthX();return}
+function renderAuth(){if(!REMOTE&&AM!=='carregando'){renderAuthX();return}
   if(AM==='carregando'){$('#acard').innerHTML='';$('#acard').style.display='none';return}
   const c=AM==='cadastrar',eye=id=>`<button class="eye" data-a="eye" data-t="${id}" aria-label="mostrar senha">◉</button>`;
   $('#acard').innerHTML=`<h2>${c?'criar conta':'entrar'}</h2>${c?'<div class="afld"><label for="anome">nome</label><input id="anome" autocomplete="given-name"></div><div class="afld"><label for="asob">sobrenome</label><input id="asob" autocomplete="family-name"></div>':''}<div class="afld"><label for="aem">email</label><input id="aem" type="email" autocomplete="username"></div><div class="afld"><label for="ase">senha</label><input id="ase" type="password" autocomplete="${c?'new-password':'current-password'}">${eye('ase')}</div>${c?`<div class="afld"><label for="ase2">repetir senha</label><input id="ase2" type="password" autocomplete="new-password">${eye('ase2')}</div>`:'<button class="alink" data-a="aforgot">esqueceu sua senha?</button>'}<button class="go dk" data-a="${c?'aregsave':'alogin'}" style="margin-top:${c?'14px':'6px'}">${c?'cadastrar':'entrar'}</button><button class="go ol" data-a="atoggle" style="margin-top:6px">${c?'já tem conta? entrar':'não tem conta? cadastrar'}</button><p class="aterm">ao continuar, você concorda com nossos <u>termos de serviço</u> e <u>política de privacidade</u></p>`;
@@ -1489,8 +1485,7 @@ const code6=()=>{const b=new Uint32Array(1);crypto.getRandomValues(b);return Str
 async function newCode(a){const c=code6();a.rsalt=(crypto.randomUUID?crypto.randomUUID():String(Math.random()));a.rhash=await hashPw(c,a.rsalt);return c}
 function recShow(c,first){F=null;$('#modal').classList.add('on');const mb=$('#mbox');mb.classList.remove('tm');mb.classList.add('sm');
   mb.innerHTML=`<div class="mh"><h2>código de recuperação</h2></div><p class="rnote">${first?'sua conta agora tem um código para recuperar a senha. ':''}anote ou tire um print deste código. se esquecer a senha, é com ele que você cria uma nova.</p><div class="rcode">${c}</div><p class="rnote">ele não aparece de novo. se perder, gere outro em menu › editar perfil.</p><button class="go dk" data-a="mclose" style="margin-top:18px">já anotei</button>`}
-async function recCheck(){if($('#auth').style.display==='flex')return;
-  if(REMOTE){if(ACC&&ACC.temCodigo===false&&TOKEN){ACC.temCodigo=true;const r=await api('newcode',{token:TOKEN});if(r.ok)recShow(r.codigo,true);else ACC.temCodigo=false}return}const a=getAcc();if(!a||a.rhash)return;const c=await newCode(a);lsSet(AK,JSON.stringify(a));recShow(c,true)}
+async function recCheck(){if(REMOTE||$('#auth').style.display==='flex')return;const a=getAcc();if(!a||a.rhash)return;const c=await newCode(a);lsSet(AK,JSON.stringify(a));recShow(c,true)}
 setTimeout(recCheck,1500);
 function renderAuthX(){
   const eye=id=>`<button class="eye" data-a="eye" data-t="${id}" aria-label="mostrar senha">◉</button>`,F2=(id,l,t,ac,x)=>`<div class="afld"><label for="${id}">${l}</label><input id="${id}" type="${t||'text'}" autocomplete="${ac||'off'}"${x||''}>${t==='password'?eye(id):''}</div>`;
@@ -1506,33 +1501,25 @@ var AUTHMAIL='';
 const val=id=>($('#'+id)||{}).value||'',okMail=e=>/^\S+@\S+\.\S+$/.test(e);
 Object.assign(MACT,{
   xmode:(b,D)=>{if(AM!=='cadastrar')AUTHMAIL=val('aem').trim().toLowerCase();AM=D.m;renderAuth()},
-  xlogin:async()=>{if(REMOTE){const r=await api('login',{email:val('aem').trim().toLowerCase(),senha:val('ase')});if(!r.ok){toast(r.erro||'não foi possível entrar');return}
-      TOKEN=r.token;lsSet(TK,TOKEN);HASACC=true;AUTHMAIL='';applyRemote(r);hideAuth();enterApp();return}
-    const em=val('aem').trim().toLowerCase(),pw=val('ase'),o=accAll(),a=o[em];
+  xlogin:async()=>{const em=val('aem').trim().toLowerCase(),pw=val('ase'),o=accAll(),a=o[em];
     if(!Object.keys(o).length){toast('nenhuma conta cadastrada ainda');AM='cadastrar';renderAuth();return}
-    if(!a){toast('não existe conta com esse email neste aparelho. as contas ficam salvas só no aparelho e no app onde foram criadas');return}
-    if(await hashPw(pw,a.salt)!==a.hash){toast('senha incorreta. se esqueceu, use o código de recuperação');return}
+    if(!a||await hashPw(pw,a.salt)!==a.hash){toast('email ou senha incorretos');return}
     accSwitch(em);lsSet(SK,'1');AUTHMAIL='';hideAuth();applyTheme();enterApp();refresh();recCheck()},
   xreg:async()=>{const em=val('aem').trim().toLowerCase(),pw=val('ase'),pw2=val('ase2'),nome=val('anome').trim(),sob=val('asob').trim();
     if(!nome){toast('informe seu nome');return}if(!okMail(em)){toast('digite um email válido');return}
     if(pw.length<6){toast('use ao menos 6 caracteres na senha');return}if(pw!==pw2){toast('as senhas não conferem');return}
-    if(REMOTE){const r=await api('register',{email:em,senha:pw,nome,sobrenome:sob});if(!r.ok){toast(r.erro||'erro ao cadastrar');if(/já existe/.test(r.erro||'')){AUTHMAIL=em;AM='entrar';renderAuth()}return}
-      TOKEN=r.token;lsSet(TK,TOKEN);HASACC=true;AUTHMAIL='';ACC=r.perfil;ACC.temCodigo=true;applyRemote(r);save();hideAuth();enterApp();recShow(r.codigo);return}
     if(accAll()[em]){toast('já existe uma conta com esse email. entre com ela');AUTHMAIL=em;AM='entrar';renderAuth();return}
     if(getAcc())accArchive();
     const salt=(crypto.randomUUID?crypto.randomUUID():String(Math.random())),a={email:em,salt,hash:await hashPw(pw,salt)},c=await newCode(a);
     useData(null);S.profile={nome,sobrenome:sob};lsSet(AK,JSON.stringify(a));save();lsSet(SK,'1');AUTHMAIL='';hideAuth();applyTheme();enterApp();refresh();recShow(c)},
-  xrec:async()=>{if(REMOTE){const em=val('aem').trim().toLowerCase(),pw=val('ase');if(pw!==val('ase2')){toast('as senhas não conferem');return}
-      const r=await api('recover',{email:em,codigo:val('acod'),senha:pw});if(!r.ok){toast(r.erro||'não foi possível recuperar');return}AUTHMAIL=em;AM='entrar';renderAuth();toast('senha nova criada. entre com ela');return}
-    let L={};try{L=JSON.parse(lsGet(LOCKK))||{}}catch(e){}
+  xrec:async()=>{let L={};try{L=JSON.parse(lsGet(LOCKK))||{}}catch(e){}
     if(L.until&&Date.now()<L.until){toast('muitas tentativas. tente de novo em '+Math.ceil((L.until-Date.now())/60000)+' min');return}
     const em=val('aem').trim().toLowerCase(),cd=val('acod').replace(/\D/g,''),pw=val('ase'),pw2=val('ase2'),o=accAll(),a=o[em];
     if(cd.length!==6){toast('o código tem 6 dígitos');return}if(pw.length<6){toast('use ao menos 6 caracteres na senha');return}if(pw!==pw2){toast('as senhas não conferem');return}
     if(!a||!a.rhash||await hashPw(cd,a.rsalt)!==a.rhash){L.n=(L.n||0)+1;if(L.n>=5){L={n:0,until:Date.now()+5*60000}}lsSet(LOCKK,JSON.stringify(L));toast('email ou código incorretos');return}
     lsDel(LOCKK);a.hash=await hashPw(pw,a.salt);const cur=getAcc();if(cur&&cur.email===em)lsSet(AK,JSON.stringify(a));else accReg(a);
     AUTHMAIL=em;AM='entrar';renderAuth();toast('senha nova criada. entre com ela')},
-  xnewcode:async()=>{if(REMOTE){const r=await api('newcode',{token:TOKEN});if(r.ok)recShow(r.codigo);else toast(r.erro==='sessao'?'entre de novo na sua conta':(r.erro||'erro'));return}
-    const a=getAcc();if(!a){toast('entre na sua conta primeiro');return}const c=await newCode(a);lsSet(AK,JSON.stringify(a));recShow(c)}
+  xnewcode:async()=>{const a=getAcc();if(!a){toast('entre na sua conta primeiro');return}const c=await newCode(a);lsSet(AK,JSON.stringify(a));recShow(c)}
 });
 
 /* ===================== mesmo login e dados em todos os aparelhos =====================
