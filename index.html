@@ -1296,7 +1296,7 @@ function mnavSync(){
   const ic=v=>{const e=document.querySelector('#side [data-v="'+v+'"] b');return e?e.innerHTML:''};
   n.innerHTML=[['saldos','saldos'],['totais','totais'],['+'],['tags','tags'],['menu','menu']].map(a=>a[0]==='+'
     ?'<button class="mplus" data-a="addmenu" aria-label="adicionar">+</button>'
-    :`<button class="${top===a[0]?'on':''}" data-a="v" data-v="${a[0]}">${ic(a[0])}<span>${a[1]}</span></button>`).join('')}
+    :`<button class="${top===a[0]?'on':''}" data-a="${a[0]==='saldos'?'msal':'v'}" data-v="${a[0]}">${ic(a[0])}<span>${a[1]}</span></button>`).join('')}
 function mobTop(){
   const d=new Date();
   return `<div class="mbar"><button class="mcal" data-a="hoje" aria-label="ir pra hoje"><i></i><span>${d.getDate()}</span></button><span class="mnv"><button data-a="mmp" aria-label="mês anterior">‹</button><b>${AB[MM.getMonth()]}/${String(MM.getFullYear()).slice(2)}</b><button data-a="mmn" aria-label="próximo mês">›</button></span><button class="mhz" data-a="v" data-v="horizonte" aria-label="horizonte de saldos">${hzIcon()}</button></div>`+
@@ -1320,6 +1320,7 @@ function msheet(h){$('#msheet').innerHTML=`<div class="mov" data-a="mshx"><div c
 function mshx(){const e=$('#msheet');if(e)e.innerHTML=''}
 function detReturn(){setView(DETFROM||'saldos');if(DPSEL){const p=DPSEL;DPSEL=null;openPanel(p.k,p.cats,p.mode,p.tag)}}
 var MACT={
+  msal:()=>{const n=new Date();MM=new Date(n.getFullYear(),n.getMonth(),1,12);MPEND=true;if(view==='saldos')renderMob();else setView('saldos')},
   noop:()=>{},mshx:()=>mshx(),
   mmp:()=>{MM=new Date(MM.getFullYear(),MM.getMonth()-1,1,12);MPEND=true;renderMob()},
   mmn:()=>{MM=new Date(MM.getFullYear(),MM.getMonth()+1,1,12);MPEND=true;renderMob()},
