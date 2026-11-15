@@ -927,7 +927,7 @@ document.addEventListener('click',e=>{
       if(!a){toast('nenhuma conta cadastrada ainda');AM='cadastrar';renderAuth();return}
       if(em!==a.email||await hashPw(pw,a.salt)!==a.hash){toast('email ou senha incorretos');return}
       lsSet(SK,'1');hideAuth();enterApp()},
-    atoggle:()=>{if(AM==='entrar'&&(REMOTE?HASACC:getAcc())){toast('já existe uma conta cadastrada. só uma conta tem acesso');return}AM=AM==='entrar'?'cadastrar':'entrar';renderAuth()},
+    atoggle:()=>{AM=AM==='entrar'?'cadastrar':'entrar';renderAuth()},
     aregsave:async()=>{if(REMOTE){const em=$('#aem').value.trim().toLowerCase(),pw=$('#ase').value,pw2=$('#ase2').value;
       if(!/^\S+@\S+\.\S+$/.test(em)){toast('digite um email válido');return}if(pw.length<6){toast('use ao menos 6 caracteres na senha');return}if(pw!==pw2){toast('as senhas não conferem');return}
       const nome=$('#anome').value.trim(),sob=$('#asob').value.trim();if(!nome){toast('informe seu nome');return}const r=await api('register',{email:em,senha:pw,nome,sobrenome:sob});
@@ -1490,16 +1490,17 @@ setTimeout(recCheck,1500);
 function renderAuthX(){
   const eye=id=>`<button class="eye" data-a="eye" data-t="${id}" aria-label="mostrar senha">◉</button>`,F2=(id,l,t,ac,x)=>`<div class="afld"><label for="${id}">${l}</label><input id="${id}" type="${t||'text'}" autocomplete="${ac||'off'}"${x||''}>${t==='password'?eye(id):''}</div>`;
   let h='';
-  if(AM==='cadastrar')h=`<h2>criar conta</h2>${F2('anome','nome','text','given-name')}${F2('asob','sobrenome','text','family-name')}${F2('aem','email','email','username')}${F2('ase','senha','password','new-password')}${F2('ase2','repetir senha','password','new-password')}<button class="go dk" data-a="xreg" style="margin-top:14px">cadastrar</button><button class="go ol" data-a="xmode" data-m="entrar" style="margin-top:6px">já tem conta? entrar</button>`;
+  if(AM==='cadastrar')h=`<h2>criar conta</h2>${F2('anome','nome','text','given-name')}${F2('asob','sobrenome','text','family-name')}${F2('aem','email','email','off')}${F2('ase','senha','password','new-password')}${F2('ase2','repetir senha','password','new-password')}<button class="go dk" data-a="xreg" style="margin-top:14px">cadastrar</button><button class="go ol" data-a="xmode" data-m="entrar" style="margin-top:6px">já tem conta? entrar</button>`;
   else if(AM==='recuperar')h=`<h2>recuperar senha</h2><p class="ahint">digite o email da conta e o código de 6 dígitos que apareceu quando a conta foi criada.</p>${F2('aem','email','email','username')}${F2('acod','código de recuperação','text','one-time-code',' inputmode="numeric" maxlength="6" placeholder="000000"')}${F2('ase','nova senha','password','new-password')}${F2('ase2','repetir nova senha','password','new-password')}<button class="go dk" data-a="xrec" style="margin-top:14px">criar nova senha</button><button class="go ol" data-a="xmode" data-m="entrar" style="margin-top:6px">voltar para entrar</button>`;
   else h=`<h2>entrar</h2>${F2('aem','email','email','username')}${F2('ase','senha','password','current-password')}<button class="alink" data-a="xmode" data-m="recuperar">esqueceu sua senha?</button><button class="go dk" data-a="xlogin" style="margin-top:6px">entrar</button><button class="go ol" data-a="xmode" data-m="cadastrar" style="margin-top:6px">não tem conta? cadastrar</button>`;
   $('#acard').innerHTML=h+'<p class="aterm">ao continuar, você concorda com nossos <u>termos de serviço</u> e <u>política de privacidade</u></p>';
-  if(AUTHMAIL&&$('#aem'))$('#aem').value=AUTHMAIL;
+  if(AM!=='cadastrar'&&AUTHMAIL&&$('#aem'))$('#aem').value=AUTHMAIL;
+  if(AM==='cadastrar')['anome','asob','aem','ase','ase2'].forEach(i=>{const e=$('#'+i);if(e)e.value=''});
   const f=$(AM==='cadastrar'?'#anome':AUTHMAIL&&AM==='entrar'?'#ase':'#aem');if(f)f.focus()}
 var AUTHMAIL='';
 const val=id=>($('#'+id)||{}).value||'',okMail=e=>/^\S+@\S+\.\S+$/.test(e);
 Object.assign(MACT,{
-  xmode:(b,D)=>{AUTHMAIL=val('aem').trim().toLowerCase();AM=D.m;renderAuth()},
+  xmode:(b,D)=>{if(AM!=='cadastrar')AUTHMAIL=val('aem').trim().toLowerCase();AM=D.m;renderAuth()},
   xlogin:async()=>{const em=val('aem').trim().toLowerCase(),pw=val('ase'),o=accAll(),a=o[em];
     if(!Object.keys(o).length){toast('nenhuma conta cadastrada ainda');AM='cadastrar';renderAuth();return}
     if(!a||await hashPw(pw,a.salt)!==a.hash){toast('email ou senha incorretos');return}
