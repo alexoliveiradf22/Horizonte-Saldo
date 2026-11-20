@@ -475,6 +475,30 @@ body.mob #mbox:not(.sm):not(.tm)>.go{width:calc(100% - 48px);margin:34px 24px 0;
 body.mob #mbox:not(.sm):not(.tm)>.txtb{font-size:19px;margin-top:16px}
 body.mob #mbox .sheet{position:fixed;left:12px;right:12px;top:auto;bottom:calc(12px + env(safe-area-inset-bottom,0px));max-height:80%;font-size:16px}
 body.mob #mbox .sheet.pk{top:auto}
+body.gauth .nog,.nor,body:not(.gauth) .bus-link{display:none!important}
+body.gauth #pemail{color:var(--mut)}
+#busw{position:fixed;inset:0;z-index:95;background:var(--bg)}
+#busw[hidden]{display:none}
+#busw iframe{width:100%;height:100%;border:0;display:block}
+.gbox{display:flex;flex-direction:column;align-items:center;gap:14px;padding:6px 0 4px;text-align:center}
+.gbox p{margin:0;color:var(--mut);line-height:1.5;font-size:12px}
+body.mob .gbox p{font-size:15px}
+#gbtn{min-height:44px;display:flex;justify-content:center}
+.gnote{background:var(--soft);border-radius:10px;padding:10px 12px;font-size:12px;line-height:1.5;color:var(--fg);text-align:left}
+body.mob .gnote{font-size:14px}
+.gmail{font-weight:700;word-break:break-all}
+
+.ml a{display:flex;align-items:center;gap:12px;width:100%;padding:13px 14px;border-bottom:1px solid var(--line);text-decoration:none;color:inherit}
+.ml a:hover{background:var(--soft)}
+a.mme{text-decoration:none;color:var(--fg)}
+.lkb{padding:14px 16px 16px}
+.lkb label{display:block;font-size:11px;font-weight:700;color:var(--mut)}
+.lkb input{width:100%;border:0;border-bottom:1px solid var(--line);background:none;outline:0;font:inherit;color:inherit;padding:8px 0 10px}
+.lkb small{display:block;color:var(--mut);margin-top:8px;line-height:1.4;font-size:11px}
+.lkb .row2{display:flex;gap:8px;margin-top:12px}
+.lkb .row2 .go{margin:0}
+body.mob .lkb input{font-size:16px}body.mob .lkb small{font-size:13px}
+
 #toast{max-width:calc(100% - 32px);text-align:center}
 #toast{max-width:min(92vw,420px);width:max-content;text-align:center;line-height:1.35}
 .rcode{font-size:40px;font-weight:700;letter-spacing:8px;text-align:center;margin:18px 0 6px;font-variant-numeric:tabular-nums}
@@ -582,6 +606,7 @@ body.mob #acard{width:min(360px,100%);font-size:16px;padding:28px 26px 22px}body
     <button data-a="addmenu"><b class="blk">+</b><span>adicionar</span></button>
     <button data-a="hoje"><b><svg viewBox="0 0 34 34" aria-hidden="true" style="stroke:none"><rect y="3" width="34" height="31" rx="5" fill="#e3e5ea"/><path d="M0 8a5 5 0 0 1 5-5h24a5 5 0 0 1 5 5v3H0z" fill="#ee6a35"/><rect x="8" y="0" width="4" height="7" rx="1.6" fill="#222"/><rect x="22" y="0" width="4" height="7" rx="1.6" fill="#222"/><text id="hd" x="17" y="28" text-anchor="middle" font-size="15" font-weight="700" fill="#222">31</text></svg></b><span>ir pra hoje</span></button>
     <button data-a="v" data-v="horizonte"><b><svg viewBox="0 0 24 24" aria-hidden="true"><rect class="hzb" x="3" y="4" width="18" height="4" rx="1.5" fill="#f3d58a" stroke="none"/><rect class="hzb" x="3" y="10" width="18" height="4" rx="1.5" fill="#f3d58a" stroke="none"/><rect class="hzb" x="3" y="16" width="18" height="4" rx="1.5" fill="#f3d58a" stroke="none"/></svg></b><span>horizonte</span></button>
+    <a class="bus-link" href="https://claude.ai/artifact/191eRXrAQsdi4FJ5L4VcXE" target="_blank" rel="noopener"><b><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M15.5 8.5l-2 5-5 2 2-5z"/></svg></b><span>bússola ↗</span></a>
     <button class="colp" data-a="collapse" aria-label="recolher menu"><b>‹</b></button>
   </nav>
   <main>
@@ -624,6 +649,7 @@ body.mob #acard{width:min(360px,100%);font-size:16px;padding:28px 26px 22px}body
           
           
           
+          <a class="bus-link" href="https://claude.ai/artifact/191eRXrAQsdi4FJ5L4VcXE" target="_blank" rel="noopener"><b>🧭</b>abrir bússola<em>↗</em></a>
           <button data-a="logout"><b>⇥</b>sair</button>
         </div>
       </div></div>
@@ -638,8 +664,8 @@ body.mob #acard{width:min(360px,100%);font-size:16px;padding:28px 26px 22px}body
           <div class="fld"><label for="psob">sobrenome</label><input id="psob" autocomplete="off"></div>
           <div style="padding:16px 16px 0"><button class="go dk" data-a="psave" style="margin:0">salvar dados pessoais</button><small style="display:block;color:var(--mut);margin-top:10px;line-height:1.4">ao alterar seus dados ou a senha, você sai e entra de novo com a conta.</small></div>
         </div>
-        <p class="sec">alterar senha</p>
-        <div class="lst" style="padding-bottom:16px">
+        <p class="sec nog">alterar senha</p>
+        <div class="lst nog" style="padding-bottom:16px">
           <div class="fld"><label for="pw1">nova senha</label><input id="pw1" type="password" autocomplete="new-password"><button class="eye" data-a="eye" data-t="pw1" aria-label="mostrar senha">◉</button></div>
           <div class="fld"><label for="pw2">repetir senha</label><input id="pw2" type="password" autocomplete="new-password"><button class="eye" data-a="eye" data-t="pw2" aria-label="mostrar senha">◉</button></div>
           <div style="padding:16px 16px 0"><button class="go ol" data-a="pwsave" style="margin:0">salvar senha</button></div><div style="padding:12px 16px 0"><button class="go ol" data-a="xnewcode" style="margin:0">gerar novo código de recuperação</button><small style="display:block;color:var(--mut);margin-top:10px;line-height:1.4">o código de 6 dígitos serve para criar uma senha nova se você esquecer a atual.</small></div>
@@ -678,6 +704,8 @@ body.mob #acard{width:min(360px,100%);font-size:16px;padding:28px 26px 22px}body
           <button data-a="zerar"><b>⟳</b><span><strong>zerar minha conta</strong><small>apaga todas as movimentações e recomeça sua conta do zero</small></span></button>
           <button data-a="apagarconta" class="redt"><b>▯</b><span><strong>apagar minha conta</strong><small>exclui permanentemente sua conta e apaga todos os seus dados no app</small></span></button>
         </div>
+        <p class="sec nor">apps conectados</p>
+        <div class="lst lkb nor"><label for="lkBus">endereço da bússola</label><input id="lkBus" placeholder="https://..." autocomplete="off" inputmode="url"><small>já vem com o endereço da bússola no Claude. quando publicar a bússola no GitHub, cole aqui o endereço de lá. em branco volta ao padrão.</small><div class="row2"><button class="go dk" data-a="lksave">salvar</button><a class="go ol bus-link" href="#" target="_blank" rel="noopener" style="text-align:center;text-decoration:none">abrir ↗</a></div></div>
       </div></div>
     </section>
     <section class="view" id="v-det" hidden>
@@ -708,12 +736,14 @@ body.mob #acard{width:min(360px,100%);font-size:16px;padding:28px 26px 22px}body
 </aside>
 <div id="menu"></div>
 <div id="modal"><div id="mbox"></div></div>
+<div id="busw" hidden><iframe id="busf" title="bússola" allow="clipboard-write"></iframe></div>
 
 <script>
 /* ===== SERVIDOR (Google Apps Script) =====
    Cole aqui a URL do "app da web" publicado pelo Apps Script (termina em /exec).
    Vazio = modo local: contas e dados ficam só neste navegador. */
-const API_URL='https://script.google.com/macros/s/AKfycbyyO0sF_Y6gbxplhMY_D-BlveZdlIKoJPKaEhAR_t5t87x68JwtOKHLh50wxJ0O2CQHKg/exec';
+const API_URL='https://script.google.com/macros/s/AKfycbyQJS1EPgg34lfEHXOGZWF-RIdr9yACeE-vv8ahrONNudf_oWKi-F0_4RzGkoBVOn0jnA/exec';            // endereço do servidor (Apps Script, termina em /exec)
+const GOOGLE_CLIENT_ID='811493841631-odvsol2tiq3pjk1u97402apnqbli0o6k.apps.googleusercontent.com';   // ID do cliente do Google (termina em .apps.googleusercontent.com)
 const IN_GAS=!!(window.google&&google.script&&google.script.run);
 const REMOTE=IN_GAS||!!API_URL;
 
@@ -973,7 +1003,7 @@ document.addEventListener('click',e=>{
     eye:()=>{const i=$('#'+D.t);i.type=i.type==='password'?'text':'password'},
     psave:async()=>{const email=$('#pemail').value.trim().toLowerCase(),nome=$('#pnome').value.trim(),sobrenome=$('#psob').value.trim();
       if(!/^\S+@\S+\.\S+$/.test(email)){toast('digite um email válido');return}
-      if(REMOTE){const r=await api('profile',{token:TOKEN,email,nome,sobrenome});if(!r.ok){toast(r.erro||'erro ao salvar');return}doLogout('dados alterados. entre novamente com sua conta');return}
+      if(REMOTE){const r=await api('profile',{token:TOKEN,email,nome,sobrenome});if(!r.ok){toast(r.erro||'erro ao salvar');return}if(r.perfil)ACC=r.perfil;S.profile={nome,sobrenome};mname();memail();toast('dados salvos');return}
       const ac=getAcc();if(ac){ac.email=email;lsSet(AK,JSON.stringify(ac))}S.profile={nome,sobrenome};save();doLogout('dados alterados. entre novamente com sua conta')},
     pwsave:async()=>{const a=$('#pw1').value,c=$('#pw2').value;if(a.length<6){toast('use ao menos 6 caracteres');return}if(a!==c){toast('as senhas não conferem');return}
       if(REMOTE){const r=await api('password',{token:TOKEN,senha:a});if(!r.ok){toast(r.erro||'erro ao alterar a senha');return}doLogout('senha alterada. entre novamente com sua conta');return}
@@ -1032,8 +1062,8 @@ const VIEWS=['saldos','totais','tags','menu','perfil','cartoes','prev','totdet',
 var PVF='menu';
 function setView(v){if(typeof mshx==='function')mshx();if(v==='prev')PVF=view==='totais'?'totais':'menu';view=v;VIEWS.forEach(n=>$('#v-'+n).hidden=n!==v);document.querySelectorAll('#side [data-v]').forEach(b=>b.classList.toggle('on',b.dataset.v===({perfil:'menu',cartoes:'menu',prev:'menu',config:'menu',totdet:'totais',det:'saldos'}[v]||v)));$('#addmenu').style.display='none';closePanel();refresh();if(typeof mnavSync==='function')mnavSync();if(v==='perfil')fillPerfil();if(v==='menu'){mname();memail()}}
 function refresh(){
-  if(view==='saldos'){if(MOB)renderMob();else grid()}if(view==='totais')renderTotais();if(view==='tags')renderTags();if(view==='horizonte')renderHz();if(view==='menu'&&MOB)renderMenuM();if(view==='cartoes')renderCartoes();if(view==='det')renderDet();if(view==='prev')renderPrev();if(view==='config')renderConfig();if(view==='totdet')renderTotDet();
-  if(sel){renderPanel();markSel()}if(typeof hzSide==='function')hzSide()}
+  if(view==='saldos'){if(MOB)renderMob();else grid()}if(view==='totais')renderTotais();if(view==='tags')renderTags();if(view==='horizonte')renderHz();if(view==='menu'&&MOB)renderMenuM();if(view==='cartoes')renderCartoes();if(view==='det')renderDet();if(view==='prev')renderPrev();if(view==='config'){renderConfig();fillLinks()}if(view==='totdet')renderTotDet();
+  if(sel){renderPanel();markSel()}if(typeof hzSide==='function')hzSide();if(typeof paintBus==='function')paintBus()}
 function tmLabel(){document.querySelectorAll('.tml').forEach(e=>e.textContent=AB[TM.getMonth()]+'/'+TM.getFullYear())}
 const ico=i=>`<i style="--c:${CATS[i].c}">${CATS[i].ic}</i>`;
 const ringI='<i class="ring" style="--c:#e8409a"></i>';
@@ -1095,7 +1125,7 @@ function cardRow(){if(F.cat!==4)return '';const c=cardOf(F.card);return `<button
 function vencRow(){if(F.cat!==4||!F.card||!F.venc||F.id)return '';const d=parse(F.venc);return `<button class="row" data-a="sh-venc"><b class="g">${IC.cal}</b><span>vencimento</span><em>${pad(d.getDate())}/${pad(d.getMonth()+1)}/${String(d.getFullYear()).slice(2)} ${IC.chev}</em></button>`}
 function fullName(){return ((S.profile.nome||'').trim()+' '+(S.profile.sobrenome||'').trim()).trim()||'usuário'}
 function mname(){$('#mname').textContent=fullName();if(typeof MOB!=='undefined'&&MOB&&view==='menu'&&typeof renderMenuM==='function')renderMenuM()}
-function fillPerfil(){$('#pemail').value=REMOTE?((ACC&&ACC.email)||''):((getAcc()||{}).email||'');$('#pnome').value=S.profile.nome||'';$('#psob').value=S.profile.sobrenome||'';$('#pw1').value='';$('#pw2').value=''}
+function fillPerfil(){setTimeout(()=>{const e=$('#pemail');if(e)e.readOnly=REMOTE},0);$('#pemail').value=REMOTE?((ACC&&ACC.email)||''):((getAcc()||{}).email||'');$('#pnome').value=S.profile.nome||'';$('#psob').value=S.profile.sobrenome||'';$('#pw1').value='';$('#pw2').value=''}
 function renderCartoes(){
   $('#cardlist').innerHTML=S.cards.length?S.cards.map(c=>`<div class="cdr"><b>▭</b><div class="tx"><b>${esc(c.n)}</b><small>dia do fechamento: ${c.c}</small><small>dia do vencimento: ${c.v}</small></div><button class="kb" data-a="ckb" data-id="${c.id}" aria-label="opções">⋮</button></div>`).join(''):'<p class="sl" style="border:0">nenhum cartão cadastrado. toque no ícone ▭+ para adicionar.</p>'}
 function openCardModal(c){
@@ -1168,7 +1198,7 @@ function applyRemote(r){
 async function pullRemote(){
   if(!REMOTE||!TOKEN||pending)return;const r=await api('load',{token:TOKEN});
   if(r.ok)applyRemote(r);else if(r.erro==='sessao')doLogout('sessão expirada. entre novamente')}
-function doLogout(msg){if(!REMOTE)accArchive();lsDel(SK);lsDel(TK);TOKEN=null;ACC=null;closePanel();showAuth(REMOTE?'entrar':(accList().length?'entrar':'cadastrar'));if(msg)toast(msg)}
+function doLogout(msg){if(typeof closeBus==='function')closeBus(true);try{if(window.google&&google.accounts&&google.accounts.id)google.accounts.id.disableAutoSelect()}catch(e){}if(!REMOTE)accArchive();lsDel(SK);lsDel(TK);TOKEN=null;ACC=null;closePanel();showAuth(REMOTE?'entrar':(accList().length?'entrar':'cadastrar'));if(msg)toast(msg)}
 async function bootRemote(){
   showAuth('carregando');
   if(TOKEN){const r=await api('load',{token:TOKEN});if(r.ok){HASACC=true;applyRemote(r);hideAuth();return}
@@ -1466,6 +1496,7 @@ function renderMenuM(){
   const it=(v,ic,t)=>`<button class="mme" data-a="v" data-v="${v}">${ic}<span>${t}</span><em>›</em></button>`;
   $('#mmenu').innerHTML=`<div class="mmh"><h2></h2><div></div><span class="mbadge">${SV.ok}assinatura ativa</span></div>`+
     it('perfil',SV.user,'editar perfil')+it('prev',P,'previsão de diário')+it('cartoes',SV.card,'cartões de crédito')+it('config',SV.gear,'configurações')+
+    `<a class="mme bus-link" href="${esc(busUrl())}" target="_blank" rel="noopener"><i class="dpv" style="--c:var(--fg);border:0;font-size:22px">🧭</i><span>${REMOTE?'bússola':'abrir bússola'}</span><em>${REMOTE?'›':'↗'}</em></a>`+
     `<button class="mme last" data-a="logout">${SV.out}<span>sair</span></button>`;
   $('#mmenu h2').textContent=fullName();$('#mmenu .mmh div').textContent=a&&a.email?a.email:''}
 /* ícone do horizonte no computador: cada tracinho é um dia (hoje, amanhã e depois) com a cor do saldo */
@@ -1494,10 +1525,10 @@ const code6=()=>{const b=new Uint32Array(1);crypto.getRandomValues(b);return Str
 async function newCode(a){const c=code6();a.rsalt=(crypto.randomUUID?crypto.randomUUID():String(Math.random()));a.rhash=await hashPw(c,a.rsalt);return c}
 function recShow(c,first){F=null;$('#modal').classList.add('on');const mb=$('#mbox');mb.classList.remove('tm');mb.classList.add('sm');
   mb.innerHTML=`<div class="mh"><h2>código de recuperação</h2></div><p class="rnote">${first?'sua conta agora tem um código para recuperar a senha. ':''}anote ou tire um print deste código. se esquecer a senha, é com ele que você cria uma nova.</p><div class="rcode">${c}</div><p class="rnote">ele não aparece de novo. se perder, gere outro em menu › editar perfil.</p><button class="go dk" data-a="mclose" style="margin-top:18px">já anotei</button>`}
-async function recCheck(){if($('#auth').style.display==='flex')return;
+async function recCheck(){if($('#auth').style.display==='flex'||REMOTE)return;
   if(REMOTE){if(ACC&&ACC.temCodigo===false&&TOKEN){ACC.temCodigo=true;const r=await api('newcode',{token:TOKEN});if(r.ok)recShow(r.codigo,true);else ACC.temCodigo=false}return}const a=getAcc();if(!a||a.rhash)return;const c=await newCode(a);lsSet(AK,JSON.stringify(a));recShow(c,true)}
 setTimeout(recCheck,1500);
-function renderAuthX(){
+function renderAuthX(){if(REMOTE){renderAuthG();return}
   const eye=id=>`<button class="eye" data-a="eye" data-t="${id}" aria-label="mostrar senha">◉</button>`,F2=(id,l,t,ac,x)=>`<div class="afld"><label for="${id}">${l}</label><input id="${id}" type="${t||'text'}" autocomplete="${ac||'off'}"${x||''}>${t==='password'?eye(id):''}</div>`;
   let h='';
   if(AM==='cadastrar')h=`<h2>criar conta</h2>${F2('anome','nome','text','given-name')}${F2('asob','sobrenome','text','family-name')}${F2('aem','email','email','off')}${F2('ase','senha','password','new-password')}${F2('ase2','repetir senha','password','new-password')}<button class="go dk" data-a="xreg" style="margin-top:14px">cadastrar</button><button class="go ol" data-a="xmode" data-m="entrar" style="margin-top:6px">já tem conta? entrar</button>`;
@@ -1559,6 +1590,85 @@ async function syncNow(){
 window.addEventListener('online',()=>{if(pending)syncNow()});
 async function retryLoad(){if(!REMOTE||!TOKEN)return;const r=await api('load',{token:TOKEN});
   if(r.ok){applyRemote(r);return}if(r.erro==='sessao'){doLogout('sessão expirada. entre novamente');return}setTimeout(retryLoad,10000)}
+/* apps conectados: endereço da Bússola */
+var BUS_DEFAULT='https://claude.ai/artifact/191eRXrAQsdi4FJ5L4VcXE';
+function busUrl(){const u=((S.links||{}).bussola||'').trim();return /^https?:\/\//i.test(u)?u:BUS_DEFAULT}
+function paintBus(){document.querySelectorAll('a.bus-link').forEach(a=>a.href=busUrl())}
+function fillLinks(){const i=$('#lkBus');if(i)i.value=((S.links||{}).bussola||'').trim()||BUS_DEFAULT;paintBus()}
+MACT.lksave=()=>{const v=(($('#lkBus')||{}).value||'').trim();if(v&&!/^https?:\/\//i.test(v)){toast('o endereço precisa começar com https://');return}
+  S.links=Object.assign({},S.links,{bussola:v===BUS_DEFAULT?'':v});save();fillLinks();toast('endereço da bússola salvo')};
+/* ===================== entrar com Google (modo servidor) ===================== */
+if(REMOTE)document.body.classList.add('gauth');
+var GT=null,GISP=null;
+function loadGis(){if(GISP)return GISP;GISP=new Promise((res,rej)=>{if(window.google&&google.accounts&&google.accounts.id)return res();const s=document.createElement('script');s.src='https://accounts.google.com/gsi/client';s.async=true;s.onload=()=>res();s.onerror=()=>{GISP=null;rej()};document.head.appendChild(s)});return GISP}
+function renderAuthG(){
+  const c=$('#acard');let h='';
+  if(AM==='gnovo'&&GT){
+    h=`<h2>bem-vindo!</h2><div class="gbox"><p>primeira vez com</p><div class="gmail">${esc(GT.email)}</div>
+      ${GT.temContas?`<div class="gnote">já usava o app com email e senha? junte as contas para continuar com todos os seus lançamentos. você só faz isso uma vez.</div><button class="go dk" data-a="gmode" data-m="glink" style="margin:0">juntar com a conta que já tenho</button>`:''}
+      <button class="go ${GT.temContas?'ol':'dk'}" data-a="gnova" style="margin:0">começar uma conta nova</button>
+      <button class="alink" data-a="gmode" data-m="entrar" style="margin:4px 0 0">usar outra conta Google</button></div>`;
+  }else if(AM==='glink'&&GT){
+    const eye=id=>`<button class="eye" data-a="eye" data-t="${id}" aria-label="mostrar senha">◉</button>`;
+    h=`<h2>juntar contas</h2><p class="ahint">digite o email e a senha que você usava antes. depois disso, essa conta passa a entrar só com <b>${esc(GT.email)}</b>.</p>
+      <div class="afld"><label for="aem">email antigo</label><input id="aem" type="email" autocomplete="username"></div>
+      <div class="afld"><label for="ase">senha antiga</label><input id="ase" type="password" autocomplete="current-password">${eye('ase')}</div>
+      <button class="go dk" data-a="glink" style="margin-top:14px">juntar contas</button><button class="go ol" data-a="gmode" data-m="gnovo" style="margin-top:6px">voltar</button>`;
+  }else{
+    h=`<h2>entrar</h2><div class="gbox"><p>use a sua conta Google. não precisa criar senha, e quem cuida da recuperação de acesso é o próprio Google.</p><div id="gbtn"></div><p id="gmsg"></p></div>`;
+  }
+  c.innerHTML=h+'<p class="aterm">ao continuar, você concorda com nossos <u>termos de serviço</u> e <u>política de privacidade</u></p>';
+  if(AM==='glink'){const f=$('#aem');if(f)f.focus()}
+  if(AM!=='gnovo'&&AM!=='glink')gisButton()}
+async function gisButton(){
+  const msg=t=>{const e=$('#gmsg');if(e)e.textContent=t};
+  if(IN_GAS){msg('este endereço é só o servidor. abra o app pelo endereço do GitHub.');return}
+  if(!GOOGLE_CLIENT_ID){msg('falta configurar o ID do cliente do Google no app (GOOGLE_CLIENT_ID).');return}
+  try{await loadGis()}catch(e){msg('não consegui carregar o login do Google. confira a internet e tente de novo.');return}
+  const el=$('#gbtn');if(!el)return;
+  try{google.accounts.id.initialize({client_id:GOOGLE_CLIENT_ID,callback:onGoogle,auto_select:true,cancel_on_tap_outside:true,itp_support:true});
+    google.accounts.id.renderButton(el,{type:'standard',theme:'filled_black',size:'large',shape:'pill',text:'continue_with',locale:'pt-BR',width:Math.min(280,el.clientWidth||280)});
+    google.accounts.id.prompt()}catch(e){msg('não consegui mostrar o botão do Google.')}}
+async function onGoogle(resp){
+  const e=$('#gmsg');if(e)e.textContent='entrando…';
+  const r=await api('google',{credential:resp&&resp.credential});
+  if(!r.ok){if(e)e.textContent='';toast(r.erro||'não foi possível entrar');return}
+  if(r.novo){GT=r;AM='gnovo';renderAuth();return}
+  gLogin(r)}
+function gLogin(r){GT=null;TOKEN=r.token;lsSet(TK,TOKEN);lsSet(SK,'1');HASACC=true;applyRemote(r);hideAuth();enterApp();if(location.hash==='#bussola')setTimeout(openBus,300)}
+Object.assign(MACT,{
+  gmode:(b,D)=>{AM=D.m;renderAuth()},
+  gnova:async()=>{const r=await api('gnew',{ticket:GT&&GT.ticket});if(!r.ok){toast(r.erro||'erro');if(/tempo/.test(r.erro||'')){AM='entrar';renderAuth()}return}gLogin(r)},
+  glink:async()=>{const r=await api('glink',{ticket:GT&&GT.ticket,email:val('aem').trim().toLowerCase(),senha:val('ase')});if(!r.ok){toast(r.erro||'erro');if(/tempo/.test(r.erro||'')){AM='entrar';renderAuth()}return}gLogin(r);toast('contas juntadas. agora é só entrar com o Google')}
+});
+
+/* ===================== Bússola por dentro do Horizonte ===================== */
+window.HZ={
+  api:(a,p)=>api(a,p),
+  token:()=>TOKEN,
+  conta:()=>(ACC&&(ACC.conta||ACC.email))||'',
+  nome:()=>fullName(),
+  close:()=>closeBus(),
+  toast:m=>toast(m)
+};
+function openBus(){
+  if(!REMOTE){const a=document.querySelector('a.bus-link');if(a)window.open(a.href,'_blank');return}
+  if(!TOKEN){toast('entre na sua conta primeiro');return}
+  const w=$('#busw'),f=$('#busf');
+  if(!f.getAttribute('src')||f.dataset.conta!==HZ.conta()){f.dataset.conta=HZ.conta();f.src='bussola.html?v=1#embed'}
+  w.hidden=false;document.documentElement.style.overflow='hidden';
+  if(location.hash!=='#bussola')try{history.pushState(null,'','#bussola')}catch(e){location.hash='bussola'}}
+function closeBus(reset){
+  const w=$('#busw');if(!w)return;
+  if(reset){const f=$('#busf');f.removeAttribute('src');f.dataset.conta=''}
+  const was=!w.hidden;w.hidden=true;document.documentElement.style.overflow='';
+  if(was&&location.hash==='#bussola')try{history.replaceState(null,'',location.pathname+location.search)}catch(e){}
+  if(!reset)refresh()}
+window.addEventListener('hashchange',()=>{if(location.hash==='#bussola'){if(REMOTE&&TOKEN)openBus()}else if(!$('#busw').hidden)closeBus()});
+document.addEventListener('click',e=>{const a=e.target.closest&&e.target.closest('a.bus-link');if(a&&REMOTE){e.preventDefault();e.stopPropagation();openBus()}},true);
+if(REMOTE){document.querySelectorAll('#side a.bus-link span').forEach(s=>s.textContent='bússola');document.querySelectorAll('.ml a.bus-link').forEach(a=>{a.lastElementChild.textContent='›';a.childNodes.forEach(n=>{if(n.nodeType===3&&/abrir/.test(n.textContent))n.textContent='bússola'})})}
+if(REMOTE&&location.hash==='#bussola')setTimeout(()=>{if(TOKEN&&$('#auth').style.display!=='flex')openBus()},1500);
+
 /* ===================== mesmo login e dados em todos os aparelhos =====================
    Os dados e a conta ficam guardados na sua conta Claude (área privada deste app),
    então computador e celular abrem o mesmo login e as mesmas movimentações. */
