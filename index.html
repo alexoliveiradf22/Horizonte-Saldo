@@ -997,7 +997,7 @@ document.addEventListener('click',e=>{
     newtagscr:()=>openTagModal(),
     tkb:()=>{const r=b.getBoundingClientRect();mn.innerHTML=`<button data-a="tedit" data-n="${D.n}">editar</button><button data-a="tdel" data-n="${D.n}" class="red">apagar</button>`;mn.style.display='block';mn.style.top=r.bottom+4+'px';mn.style.left=Math.max(8,r.right-mn.offsetWidth)+'px'},
     tedit:()=>{const t=S.tags.find(x=>x.n===D.n);mn.style.display='none';if(t)openTagModal(t)},
-    tdel:()=>{const nm=D.n;mn.style.display='none';askConfirm('apagar tag','apenas a tag será removida. as movimentações continuam registradas.','apagar',()=>{if(sel&&sel.mode==='tag'&&sel.tag===nm)closePanel();S.tags=S.tags.filter(x=>x.n!==nm);S.items.forEach(it=>{it.tags=(it.tags||[]).filter(x=>x!==nm)});save();refresh()},true)},
+    tdel:()=>{const nm=D.n;mn.style.display='none';askConfirm('apagar tag','apenas a tag será removida. as movimentações continuam registradas.','apagar',()=>{if(sel&&sel.mode==='tag'&&sel.tag===nm)closePanel();S.tags=S.tags.filter(x=>x.n!==nm);S.items.forEach(it=>{it.tags=(it.tags||[]).filter(x=>x!==nm);if(it.ov)Object.values(it.ov).forEach(o=>{if(o&&o.tags)o.tags=o.tags.filter(x=>x!==nm)})});save();refresh()},true)},
     addmenu:()=>{const m=$('#addmenu');if(m.style.display==='block'){m.style.display='none';return}
       const DS=['salário, comissão, vales','gastos fixos, boletos, aluguel','gastos variáveis, compras','reserva, investimento','gastos ou total da fatura'];
       m.innerHTML='<div class="am-h">adicionar</div>'+CATS.map((c,i)=>`<button class="am" data-a="addcat" data-i="${i}"><b><i style="--c:${c.c}">${c.ic}</i>${i===4?'gastos com cartão':c.sg}</b><small>${DS[i]}</small></button>`).join('');
@@ -1012,7 +1012,7 @@ document.addEventListener('click',e=>{
     ptag:()=>{const t=D.t,i=F.tags.indexOf(t);i>-1?F.tags.splice(i,1):F.tags.push(t);$('#tl').innerHTML=tagList()},
     newtagopen:()=>{NT=newNT();openSheet('newtag')},calct:()=>{NT.calc[D.k]=D.v==='1';openSheet('newtag')},newtagclose:()=>F?openSheet('tags'):closeModal(),ncolor:()=>openSheet('tagcolor'),pcolor:()=>{NT.c=D.c;openSheet('newtag')},advtog:()=>{NT.adv=!NT.adv;openSheet('newtag')},
     newtagsave:()=>{const n=NT.n.trim();if(!n){$('#ntn').focus();return}
-      if(NT.edit){const t=S.tags.find(x=>x.n===NT.edit);if(t){S.items.forEach(it=>{it.tags=(it.tags||[]).map(x=>x===t.n?n:x)});t.n=n;t.c=NT.c;t.calc={...NT.calc};if(sel&&sel.mode==='tag'&&sel.tag===NT.edit)sel.tag=n}save();closeModal();refresh();return}
+      if(NT.edit){const t=S.tags.find(x=>x.n===NT.edit);if(t){S.items.forEach(it=>{it.tags=(it.tags||[]).map(x=>x===t.n?n:x);if(it.ov)Object.values(it.ov).forEach(o=>{if(o&&o.tags)o.tags=o.tags.map(x=>x===t.n?n:x)})});t.n=n;t.c=NT.c;t.calc={...NT.calc};if(sel&&sel.mode==='tag'&&sel.tag===NT.edit)sel.tag=n}save();closeModal();refresh();return}
       const ex=S.tags.find(t=>t.n.toLowerCase()===n.toLowerCase());if(!ex&&S.tags.length>=100)return;const cs=$('#cs'),ct=$('#ct');if(!ex)S.tags.push({n,c:NT.c,calc:{...NT.calc}});const nm=ex?ex.n:n;
       if(F){if(!F.tags.includes(nm))F.tags.push(nm);save();openSheet('tags')}else{save();closeModal();refresh()}},
     kb:()=>{const r=b.getBoundingClientRect(),it=S.items.find(x=>x.id===D.id);
@@ -1157,10 +1157,11 @@ async function api(action,payload){
 function pushRemote(){
   if(!REMOTE){if(typeof dbPush==='function')dbPush();return}
   if(!TOKEN)return;pending=true;clearTimeout(pt);
-  pt=setTimeout(async()=>{const r=await api('save',{token:TOKEN,data:JSON.stringify(S)});pending=false;if(r&&r.erro==='sessao')doLogout('sessão expirada. entre novamente');else if(r&&!r.ok)toast('não foi possível sincronizar')},700)}
+  DIRTYN++;try{localStorage.setItem('horizonte.dirty',(ACC&&ACC.email)||'1')}catch(e){}pt=setTimeout(syncNow,700)}
 function applyRemote(r){
   ACC=r.perfil;
-  {let d=null;try{d=r.data?JSON.parse(r.data):null}catch(e){}useData(d)}
+  {let d=null;try{d=r.data?JSON.parse(r.data):null}catch(e){}let loc=null;try{{const dk=localStorage.getItem('horizonte.dirty');if(dk&&(dk==='1'||dk===(r.perfil&&r.perfil.email)))loc=JSON.parse(localStorage.getItem('horizonte.v1'))}}catch(e){}
+   if(loc){useData(loc);ACC=r.perfil;setTimeout(()=>{if(TOKEN){pending=true;DIRTYN++;syncNow()}},0)}else useData(d);cleanTags()}
   S.tags=(S.tags||[]).map(t=>typeof t==='string'?{n:t,c:'cinza'}:t);
   S.profile={nome:ACC.nome||'',sobrenome:ACC.sobrenome||''};
   applyTheme();mname();memail();refresh();if(typeof recCheck==='function')setTimeout(recCheck,400)}
@@ -1170,7 +1171,9 @@ async function pullRemote(){
 function doLogout(msg){if(!REMOTE)accArchive();lsDel(SK);lsDel(TK);TOKEN=null;ACC=null;closePanel();showAuth(REMOTE?'entrar':(accList().length?'entrar':'cadastrar'));if(msg)toast(msg)}
 async function bootRemote(){
   showAuth('carregando');
-  if(TOKEN){const r=await api('load',{token:TOKEN});if(r.ok){HASACC=true;applyRemote(r);hideAuth();return}lsDel(TK);TOKEN=null}
+  if(TOKEN){const r=await api('load',{token:TOKEN});if(r.ok){HASACC=true;applyRemote(r);hideAuth();return}
+    if(r.erro!=='sessao'){HASACC=true;hideAuth();enterApp();toast('sem conexão: mostrando os dados guardados neste aparelho');setTimeout(retryLoad,5000);return}
+    lsDel(TK);TOKEN=null}
   const st=await api('status',{});HASACC=!!(st.ok&&st.hasAccount);
   if(!st.ok)toast(st.erro||'não foi possível falar com o servidor');
   showAuth(HASACC||!st.ok?'entrar':'cadastrar')}
@@ -1251,12 +1254,12 @@ function truncate(it,k){
 function applyEdit(it,k,mode,f){
   const t=it.rep||'nao',base=key(k?addP(parse(it.date),k,t):parse(it.date));
   const setAll=()=>{it.value=f.value;it.cat=f.cat;it.desc=f.desc;it.tags=f.tags;it.card=f.card;it.compra=f.compra;
-    if(f.date!==base)it.date=key(addP(parse(f.date),-k,t))};
+    if(f.date!==base)it.date=key(addP(parse(f.date),-k,t));clrOv(it)};
   if(!isSeries(it)||t==='parcelado'||mode==='all'){setAll();return}
   if(mode==='one'){it.ov=it.ov||{};it.ov[k]={v:f.value,cat:f.cat,desc:f.desc,tags:f.tags,date:f.date!==base?f.date:undefined};return}
   if(k===0){setAll();return}
   const n=occCount(it),cl={...it,id:uid(),created:Date.now(),value:f.value,cat:f.cat,desc:f.desc,tags:f.tags,card:f.card,compra:f.compra,date:f.date,skip:(it.skip||[]).filter(x=>x>=k).map(x=>x-k),ov:{}};
-  if(it.ov)Object.keys(it.ov).forEach(x=>{if(+x>k)cl.ov[+x-k]=it.ov[x]});
+  if(it.ov)Object.keys(it.ov).forEach(x=>{if(+x>k)cl.ov[+x-k]=it.ov[x]});clrOv(cl);
   if(n!==Infinity){const r=n-k;if(r>1){cl.ate='vezes';cl.vezes=r}else{cl.rep='nao';cl.ate='infinito'}}
   truncate(it,k);S.items.push(cl)}
 function delOcc(it,k,mode){
@@ -1537,6 +1540,25 @@ Object.assign(MACT,{
     const a=getAcc();if(!a){toast('entre na sua conta primeiro');return}const c=await newCode(a);lsSet(AK,JSON.stringify(a));recShow(c)}
 });
 
+/* remove dos lançamentos (e das repetições editadas uma a uma) tags que não existem mais */
+function cleanTags(){const ok=new Set((S.tags||[]).map(t=>t.n));let ch=false;
+  (S.items||[]).forEach(it=>{const f=a=>{const b=(a||[]).filter(x=>ok.has(x));if(b.length!==(a||[]).length)ch=true;return b};it.tags=f(it.tags);if(it.ov)Object.values(it.ov).forEach(o=>{if(o&&o.tags)o.tags=f(o.tags)})});
+  return ch}
+setTimeout(()=>{if(cleanTags())save()},0);
+/* ao atualizar "todas" ou "esta e as próximas", as edições individuais antigas de valor/tipo/descrição/tags deixam de valer */
+function clrOv(it){if(!it.ov)return;Object.keys(it.ov).forEach(x=>{const o=it.ov[x];if(!o)return;delete o.v;delete o.cat;delete o.desc;delete o.tags;if(!o.date)delete it.ov[x]})}
+/* envio ao servidor com nova tentativa */
+var DIRTYN=0,SYNCBUSY=false,SYNCAGAIN=false,SYNCFAIL=0;
+async function syncNow(){
+  if(!REMOTE||!TOKEN)return;if(SYNCBUSY){SYNCAGAIN=true;return}SYNCBUSY=true;const v=DIRTYN;
+  const r=await api('save',{token:TOKEN,data:JSON.stringify(S)});SYNCBUSY=false;
+  if(r&&r.ok){SYNCFAIL=0;if(v===DIRTYN){pending=false;try{localStorage.removeItem('horizonte.dirty')}catch(e){}}else SYNCAGAIN=true}
+  else if(r&&r.erro==='sessao'){pending=false;doLogout('sessão expirada. entre novamente');return}
+  else{SYNCFAIL++;if(SYNCFAIL===1)toast('sem conexão: suas mudanças ficaram guardadas aqui e serão enviadas quando a internet voltar');clearTimeout(pt);pt=setTimeout(syncNow,Math.min(60000,3000*SYNCFAIL));return}
+  if(SYNCAGAIN){SYNCAGAIN=false;syncNow()}}
+window.addEventListener('online',()=>{if(pending)syncNow()});
+async function retryLoad(){if(!REMOTE||!TOKEN)return;const r=await api('load',{token:TOKEN});
+  if(r.ok){applyRemote(r);return}if(r.erro==='sessao'){doLogout('sessão expirada. entre novamente');return}setTimeout(retryLoad,10000)}
 /* ===================== mesmo login e dados em todos os aparelhos =====================
    Os dados e a conta ficam guardados na sua conta Claude (área privada deste app),
    então computador e celular abrem o mesmo login e as mesmas movimentações. */
