@@ -1284,12 +1284,12 @@ function truncate(it,k){
 function applyEdit(it,k,mode,f){
   const t=it.rep||'nao',base=key(k?addP(parse(it.date),k,t):parse(it.date));
   const setAll=()=>{it.value=f.value;it.cat=f.cat;it.desc=f.desc;it.tags=f.tags;it.card=f.card;it.compra=f.compra;
-    if(f.date!==base)it.date=key(addP(parse(f.date),-k,t));clrOv(it)};
+    if(f.date!==base)it.date=key(addP(parse(f.date),-k,t));clrOv(it,f.date!==base)};
   if(!isSeries(it)||t==='parcelado'||mode==='all'){setAll();return}
   if(mode==='one'){it.ov=it.ov||{};it.ov[k]={v:f.value,cat:f.cat,desc:f.desc,tags:f.tags,date:f.date!==base?f.date:undefined};return}
   if(k===0){setAll();return}
   const n=occCount(it),cl={...it,id:uid(),created:Date.now(),value:f.value,cat:f.cat,desc:f.desc,tags:f.tags,card:f.card,compra:f.compra,date:f.date,skip:(it.skip||[]).filter(x=>x>=k).map(x=>x-k),ov:{}};
-  if(it.ov)Object.keys(it.ov).forEach(x=>{if(+x>k)cl.ov[+x-k]=it.ov[x]});clrOv(cl);
+  if(it.ov)Object.keys(it.ov).forEach(x=>{if(+x>k)cl.ov[+x-k]=it.ov[x]});clrOv(cl,f.date!==base);
   if(n!==Infinity){const r=n-k;if(r>1){cl.ate='vezes';cl.vezes=r}else{cl.rep='nao';cl.ate='infinito'}}
   truncate(it,k);S.items.push(cl)}
 function delOcc(it,k,mode){
@@ -1577,7 +1577,7 @@ function cleanTags(){const ok=new Set((S.tags||[]).map(t=>t.n));let ch=false;
   return ch}
 setTimeout(()=>{if(cleanTags())save()},0);
 /* ao atualizar "todas" ou "esta e as próximas", as edições individuais antigas de valor/tipo/descrição/tags deixam de valer */
-function clrOv(it){if(!it.ov)return;Object.keys(it.ov).forEach(x=>{const o=it.ov[x];if(!o)return;delete o.v;delete o.cat;delete o.desc;delete o.tags;if(!o.date)delete it.ov[x]})}
+function clrOv(it,datas){if(!it.ov)return;Object.keys(it.ov).forEach(x=>{const o=it.ov[x];if(!o)return;delete o.v;delete o.cat;delete o.desc;delete o.tags;if(datas)delete o.date;if(!o.date)delete it.ov[x]})}
 /* envio ao servidor com nova tentativa */
 var DIRTYN=0,SYNCBUSY=false,SYNCAGAIN=false,SYNCFAIL=0;
 async function syncNow(){
