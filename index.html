@@ -475,7 +475,7 @@ body.mob #mbox:not(.sm):not(.tm)>.go{width:calc(100% - 48px);margin:34px 24px 0;
 body.mob #mbox:not(.sm):not(.tm)>.txtb{font-size:19px;margin-top:16px}
 body.mob #mbox .sheet{position:fixed;left:12px;right:12px;top:auto;bottom:calc(12px + env(safe-area-inset-bottom,0px));max-height:80%;font-size:16px}
 body.mob #mbox .sheet.pk{top:auto}
-.mstick{position:sticky;top:0;z-index:6;background:var(--bg)}
+.mstick{position:sticky;top:0;z-index:6;background:var(--bg);display:flow-root}.mfv input{font-size:38px!important}#totdet .mstick{border-bottom:1px solid var(--line)}
 .mday{border-bottom:1px solid var(--line)}.mday.hj{border-bottom:2px solid var(--fg)}
 body.mob{font-size:14px}
 .mnv b{font-size:18px;min-width:76px}.mnv button,.mhz{font-size:23px}.mnv{gap:12px}
@@ -1414,7 +1414,8 @@ var HOWT={
   custo:['como funciona o custo de vida?','custo de vida é quanto custou manter a sua vida no período: saídas + diários + gastos com cartão + previsão de diário. as economias não entram, porque são dinheiro guardado.'],
   dm:['como funciona o diário médio?','diário médio é quanto você gastou por dia, em média, com os diários: o total de diários do mês dividido pela quantidade de dias do mês.']};
 function howBox(){const t=HOWT[TD]||HOWT.perf;
-  return `<div class="ypill"><button data-a="typ" aria-label="ano anterior">‹</button><b>${TY}</b><button data-a="tyn" aria-label="próximo ano">›</button></div><div class="how${HOWO?' on':''}"><button data-a="howt">${t[0]}${IC.chev}</button>${HOWO?`<p>${t[1]}</p>`:''}</div>`}
+  const yp=`<div class="ypill"><button data-a="typ" aria-label="ano anterior">‹</button><b>${TY}</b><button data-a="tyn" aria-label="próximo ano">›</button></div><div class="how${HOWO?' on':''}"><button data-a="howt">${t[0]}${IC.chev}</button>${HOWO?`<p>${t[1]}</p>`:''}</div>`;
+  return TD==='custo'?`<div class="mstick">`+yp.replace(/<div class="how/,'</div><div class="how'):`<div class="mstick">`+yp+`</div>`}
 function renderDetM(it,e,C,d,n,chips,cr){
   const fin=it.rep&&it.rep!=='nao'&&n!==Infinity&&n>1;
   const rp=it.rep&&it.rep!=='nao'?(fin?(DT.k+1)+'/'+n+' '+UN[it.rep]:REP[it.rep][0]):'';
@@ -1754,6 +1755,26 @@ function dbApply(d){
       if(!snap.metadata.fromCache)authReady();
     },()=>{clearTimeout(to);DOCR=null;authReady()});
   }catch(e){authReady()}
+})();
+
+/* clique fora de um menu/janela aberta: só fecha, não aciona o que está atrás */
+(function(){
+  const POP=[['#menu',e=>e.style.display==='block',e=>e.style.display='none','[data-a="kb"],[data-a="tkb"],[data-a="ckb"],[data-a="gkb"]'],
+    ['#addmenu',e=>e.style.display&&e.style.display!=='none',e=>e.style.display='none','[data-a="addmenu"]'],
+    ['#rngmenu',e=>!e.hidden,e=>e.hidden=true,'[data-a="rngm"]'],['#divmenu',e=>!e.hidden,e=>e.hidden=true,'[data-a="pdivtog"]'],
+    ['#fmenu',e=>!e.hidden,e=>e.hidden=true,'#pill']];
+  let block=0;
+  function guard(ev){
+    if(Date.now()<block){ev.preventDefault();ev.stopPropagation();ev.stopImmediatePropagation();return}
+    const t=ev.target;let open=false,inside=false;
+    POP.forEach(([s,isOn,,tog])=>{const e=document.querySelector(s);if(e&&isOn(e)){open=true;if(e.contains(t)||(t.closest&&t.closest(tog)))inside=true}});
+    if(!open||inside)return;
+    POP.forEach(([s,isOn,off])=>{const e=document.querySelector(s);if(e&&isOn(e))off(e)});
+    ev.preventDefault();ev.stopPropagation();ev.stopImmediatePropagation();
+  }
+  document.addEventListener('click',guard,true);
+  /* ao fechar janela/folha tocando fora, ignora o clique "fantasma" logo em seguida */
+  document.addEventListener('click',ev=>{const t=ev.target;if(t&&(t.id==='modal'||t.id==='shade'||(t.classList&&t.classList.contains('mov'))||(t.id==='mbox'&&!document.querySelector('#sheet')?.hidden)))block=Date.now()+350},true);
 })();
 
 startFor();grid();
