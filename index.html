@@ -1778,6 +1778,22 @@ function dbApply(d){
   document.addEventListener('click',ev=>{const t=ev.target;if(t&&(t.id==='modal'||t.id==='shade'||(t.classList&&t.classList.contains('mov'))||(t.id==='mbox'&&!document.querySelector('#sheet')?.hidden)))block=Date.now()+350},true);
 })();
 
+/* computador: a data de hoje sempre visível, mais ou menos no meio.
+   pede para centralizar ao abrir, ao entrar na conta, ao carregar dados do servidor e ao clicar em saldos;
+   por 2,5 s qualquer redesenho da grade centraliza de novo (o usuário rolando cancela) */
+let HJW=0;
+function centerHoje(){if(MOB)return;HJW=Date.now()+4000;const go=()=>{if(!MOB&&view==='saldos'&&Date.now()<HJW)scrollHoje()};
+  requestAnimationFrame(()=>requestAnimationFrame(go));[120,400,900,1600,2500,3800].forEach(t=>setTimeout(go,t))}
+(function(){
+  const wrap=(n,after)=>{const f=window[n];if(typeof f!=='function')return;window[n]=function(){const r=f.apply(this,arguments);try{after(arguments)}catch(e){}return r}};
+  wrap('setView',a=>{if(a[0]==='saldos')centerHoje()});
+  wrap('grid',()=>{if(!MOB&&view==='saldos'&&Date.now()<HJW)requestAnimationFrame(scrollHoje)});
+  wrap('refresh',()=>{if(!MOB&&view==='saldos'&&Date.now()<HJW)requestAnimationFrame(scrollHoje)});wrap('enterApp',centerHoje);wrap('applyRemote',centerHoje);
+  ['wheel','mousedown','keydown','touchstart'].forEach(ev=>document.addEventListener(ev,e=>{if(e.target.closest&&e.target.closest('#scroll,#vs'))HJW=0},{passive:true,capture:true}));
+  document.addEventListener('click',e=>{const b=e.target.closest&&e.target.closest('[data-v="saldos"]');if(b&&!MOB)setTimeout(centerHoje,0)},true);
+})();
+window.addEventListener('load',centerHoje);setTimeout(centerHoje,300);document.addEventListener('visibilitychange',()=>{if(!document.hidden)centerHoje()});
+
 startFor();grid();
 scrollHoje();
 setMob();
