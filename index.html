@@ -475,6 +475,29 @@ body.mob #mbox:not(.sm):not(.tm)>.go{width:calc(100% - 48px);margin:34px 24px 0;
 body.mob #mbox:not(.sm):not(.tm)>.txtb{font-size:19px;margin-top:16px}
 body.mob #mbox .sheet{position:fixed;left:12px;right:12px;top:auto;bottom:calc(12px + env(safe-area-inset-bottom,0px));max-height:80%;font-size:16px}
 body.mob #mbox .sheet.pk{top:auto}
+.mstick{position:sticky;top:0;z-index:6;background:var(--bg)}
+.mday{border-bottom:1px solid var(--line)}.mday.hj{border-bottom:2px solid var(--fg)}
+body.mob{font-size:14px}
+.mnv b{font-size:18px;min-width:76px}.mnv button,.mhz{font-size:23px}.mnv{gap:12px}
+.mcal{width:30px;height:32px;font-size:15px}
+.mdn{font-size:14px;padding-top:9px}.mday{grid-template-columns:48px 1fr 1fr}
+.mmv{height:36px;font-size:13px;gap:8px;padding:0 10px}
+.msal{font-size:13px;padding:9px 12px}
+#mlist i,.msh i,#mtop i:not(.mcal i){width:19px;height:19px;font-size:10px}
+#mnav button{font-size:11px}#mnav .mplus{width:46px;height:46px;font-size:26px}
+body.mob h1{font-size:19px}
+.msh-h{font-size:17px;padding:10px 20px}.msh-o{font-size:15px;padding:13px 20px}
+body.mob .pill{padding:10px 14px;font-size:14px}
+body.mob .it{padding:13px 18px;font-size:14px}body.mob .it i{width:19px;height:19px;font-size:10px}
+body.mob .am-h{font-size:16px;padding:14px 20px}body.mob .am{padding:13px 20px}body.mob .am b{font-size:16px}body.mob .am small{font-size:13px;margin-left:40px}body.mob .am i{width:27px;height:27px;font-size:13px}
+body.mob #menu button{font-size:14px;padding:12px 20px}
+body.mob .sec{font-size:13px}
+body.mob .mv,body.mob .tr2,body.mob .ml button,body.mob .cdr{font-size:14px;padding:13px 14px}
+body.mob .cd2 b{font-size:13px}body.mob .cd2 h2{font-size:19px}body.mob .cd2 small,body.mob .fm{font-size:12px}
+body.mob #totdet .how{font-size:15px}
+.ypill b{font-size:17px}.ypill button{font-size:22px}
+body.mob .ph .d{font-size:17px}body.mob .ph button{font-size:21px}
+
 @media (max-width:900px){input,select,textarea{font-size:16px!important}}
 
 body.gauth .nog,.nor,body:not(.gauth) .bus-link{display:none!important}
@@ -565,6 +588,15 @@ i.dpv{background:none!important;border:2px dotted var(--c);color:var(--c)}
 .lrow{display:flex;align-items:center;gap:14px;width:100%;padding:18px 24px;border:0;border-bottom:1px solid var(--line);background:none;text-align:left;font-size:18px;font-weight:700;color:var(--fg)}
 .lrow i{width:22px;height:22px;font-size:11px}.lrow .v{margin-left:auto;font-weight:500}
 .lrow small{font-weight:400}
+.tcm .sec2{font-size:14px;padding:16px 18px 12px}.tcm .sec2.gap{margin-top:26px}
+.trow{padding:15px 18px}.trow b{font-size:16px;margin-bottom:6px}.trow .fm{font-size:13px}.trow .fm i,.trow .rr small i,.lrow i{width:19px;height:19px;font-size:10px}
+.trow .bar{width:96px;height:16px;border-width:2px}.trow .rr strong{font-size:16px}.trow .rr small{font-size:14px;margin-top:4px}
+.lrow{padding:13px 18px;font-size:15px;gap:12px}
+.mme{padding:17px 18px;font-size:16px;gap:14px}.mme em{font-size:20px}.mme i.dpv{width:24px;height:24px;font-size:12px}
+.mbadge{font-size:14px;padding:6px 13px}
+.mth{font-size:15px;padding:9px 14px 9px 18px}.mtr b{font-size:16px}.mtr .v{font-size:15px}.mtempty{font-size:15px}
+.mtr{height:56px;padding:0 18px;gap:14px}.msr{padding:10px 18px;gap:12px}.mth svg,.msr svg,.mme svg{width:23px;height:23px}
+
 
 body:not(.mob) td.c:not(.cc) i:hover{font-size:0;background:none;cursor:pointer;width:22px;height:22px;left:6px}
 body:not(.mob) td.c:not(.cc) i:hover::after{content:'+';font-size:18px;font-weight:700;color:#777;line-height:1}
@@ -1453,7 +1485,7 @@ function renderTotaisM(o){
   const P=`<i class="dpv" style="--c:${CATS[2].c}">D</i>`,dm=dmVal(TM.getFullYear(),TM.getMonth()),eco=o.eco;
   const top=`<div class="mbar"><button class="mcal" data-a="hoje" aria-label="ir pra hoje"><i></i><span>${new Date().getDate()}</span></button><span class="mnv"><button data-a="tmp" aria-label="mês anterior">‹</button><b>${AB[TM.getMonth()]}/${String(TM.getFullYear()).slice(2)}</b><button data-a="tmn" aria-label="próximo mês">›</button></span><button class="mhz" data-a="v" data-v="horizonte" aria-label="horizonte de saldos">${hzIcon()}</button></div>`;
   const row=(t,nm,fm,val,sub,st)=>`<button class="trow" data-a="tcard" data-t="${t}"><span><b>${nm}</b><span class="fm">${fm}</span></span><span class="rr"><strong${st?` style="${st}"`:''}>${val}</strong><small>${sub}</small></span></button>`;
-  $('#totais').innerHTML=top+`<div class="tcm"><p class="sec2">cálculos do mês</p>`+
+  $('#totais').innerHTML=`<div class="mstick">`+top+`</div><div class="tcm"><p class="sec2">cálculos do mês</p>`+
     row('perf','performance',`${ico(0)}–${ico(1)}–${ico(2)}–${ico(3)}–${ico(4)}–${P}`,brl(o.perf),o.perf>=0?'sobrou dinheiro':'faltou dinheiro',o.perf<0?'color:#e5383b':'')+
     row('eco','economizado',`${ico(3)}<span class="bar"><u style="width:${Math.min(100,Math.max(0,eco))}%"></u></span>${ico(0)}`,(+eco.toFixed(2)).toString().replace('.',',')+'%',ecoTxt(eco))+
     row('custo','custo de vida',`${ico(1)}+${ico(2)}+${ico(4)}+${P}`,brl(o.custo),o.custo<=o.t[0]?'dentro da renda':'acima da renda')+
@@ -1483,7 +1515,7 @@ var SV={
 function mobBar(){return `<div class="mbar"><button class="mcal" data-a="hoje" aria-label="ir pra hoje"><i></i><span>${new Date().getDate()}</span></button><span class="mnv"><button data-a="tmp" aria-label="mês anterior">‹</button><b>${AB[TM.getMonth()]}/${String(TM.getFullYear()).slice(2)}</b><button data-a="tmn" aria-label="próximo mês">›</button></span><button class="mhz" data-a="v" data-v="horizonte" aria-label="horizonte de saldos">${hzIcon()}</button></div>`}
 function renderTagsM(){
   const q=($('#mtsearch')||{}).value||'';
-  $('#mtags').innerHTML=mobBar()+`<div class="mth">tags<span><button class="${MTE?'on':''}" data-a="mtedit" aria-label="editar tags">${IC.pencil}</button><button data-a="newtagscr" aria-label="nova tag">${SV.tagadd}</button></span></div><div class="msr">${SV.search}<input id="mtsearch" placeholder="filtrar tags" autocomplete="off" value="${esc(q)}"></div><div id="mtl"></div>`;
+  $('#mtags').innerHTML=`<div class="mstick">`+mobBar()+`<div class="mth">tags<span><button class="${MTE?'on':''}" data-a="mtedit" aria-label="editar tags">${IC.pencil}</button><button data-a="newtagscr" aria-label="nova tag">${SV.tagadd}</button></span></div><div class="msr">${SV.search}<input id="mtsearch" placeholder="filtrar tags" autocomplete="off" value="${esc(q)}"></div></div><div id="mtl"></div>`;
   renderMTL()}
 function renderMTL(){
   compute(TM);const ym=ymKey(TM),sums={};
