@@ -1684,7 +1684,8 @@ window.HZ={
   conta:()=>(ACC&&(ACC.conta||ACC.email))||'',
   nome:()=>fullName(),
   close:()=>closeBus(),
-  toast:m=>toast(m)
+  toast:m=>toast(m),
+  icon:()=>{try{const cs=getComputedStyle(document.documentElement);return hzIcon().replace(/var\(--([a-z0-9]+)\)/g,(x,v)=>cs.getPropertyValue('--'+v).trim()||'#ccc').replace('<svg ','<svg class="hz-ic" ').replace('id="hzc"','id="hzcb"').replace('url(#hzc)','url(#hzcb)')}catch(e){return ''}}
 };
 function openBus(){
   if(!REMOTE){const a=document.querySelector('a.bus-link');if(a)window.open(a.href,'_blank');return}

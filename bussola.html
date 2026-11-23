@@ -2013,5 +2013,9 @@ document.head.appendChild(st);
 function start(){walk(document.body);new MutationObserver(run).observe(document.body,{childList:true,subtree:true,characterData:true})}
 if(document.body)start();else document.addEventListener('DOMContentLoaded',start);
 })();
-</script></body>
+</script><script>/* ícone do horizonte igual ao do app: saldos de hoje + 8 dias */
+(function(){var last='';function upd(){var H=null;try{H=window.parent&&window.parent!==window&&window.parent.HZ}catch(e){}
+if(!H||typeof H.icon!=='function')return;var v=H.icon();if(!v)return;
+document.querySelectorAll('svg.hz-ic').forEach(function(e){if(e.getAttribute('data-live')&&v===last)return;var t=document.createElement('div');t.innerHTML=v;var n=t.firstChild;n.setAttribute('data-live','1');e.replaceWith(n)});last=v}
+upd();setInterval(upd,1500);document.addEventListener('visibilitychange',upd)})();</script></body>
 </html>
