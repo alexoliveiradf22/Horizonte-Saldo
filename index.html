@@ -1806,15 +1806,21 @@ function mobRatchet(from,WAIT){
     const tops=[...L.querySelectorAll('.mday')].map(r=>base+r.getBoundingClientRect().top-lt).filter(t=>t>=Math.min(from,target)-1&&t<=Math.max(from,target)+1);
     const dist=Math.abs(target-from);if(dist<2){L.scrollTop=target;return}
     const dur=WAIT?1000:Math.min(800,300+tops.length*25),t0=performance.now(),ease=t=>1-Math.pow(1-t,3);
-    let stop=false;const cancel=()=>{stop=true};L.addEventListener('touchstart',cancel,{once:true,passive:true});L.addEventListener('wheel',cancel,{once:true,passive:true});
+    let stop=false;const cancel=()=>{stop=true;L.style.overflowY='';L.style.overscrollBehavior=''};
     const step=now=>{if(stop||id!==MRAT)return;const t=Math.min(1,(now-t0)/dur),p=from+(target-from)*ease(t);
       let snap=p;if(t<1&&tops.length){snap=tops.reduce((a,b)=>Math.abs(b-p)<Math.abs(a-p)?b:a)}
-      L.scrollTop=t<1?snap:target;if(t<1)requestAnimationFrame(step)};
+      L.scrollTop=t<1?snap:target;if(t<1)requestAnimationFrame(step);else fixEnd()};
+    /* trava a inércia do dedo durante o efeito e, no fim, prende hoje na primeira linha */
+    const fixEnd=()=>{const fx=()=>{if(id!==MRAT)return;const e2=L.querySelector('.mday.hj');if(e2)L.scrollTop+=e2.getBoundingClientRect().top-L.getBoundingClientRect().top};fx();requestAnimationFrame(fx);setTimeout(()=>{fx();L.style.overflowY='';L.style.overscrollBehavior=''},120);setTimeout(fx,350)};
+    L.style.overflowY='hidden';L.style.overscrollBehavior='none';
     requestAnimationFrame(step)};
   if(!WAIT){requestAnimationFrame(()=>requestAnimationFrame(run));return}
-  /* espera 1 s mostrando o dia 1; tocar na lista ou trocar de aba cancela */
-  requestAnimationFrame(()=>{L.scrollTop=from});let off=false;const c=()=>{off=true};L.addEventListener('touchstart',c,{once:true,passive:true});L.addEventListener('wheel',c,{once:true,passive:true});
-  setTimeout(()=>{if(off||id!==MRAT||view!=='saldos')return;requestAnimationFrame(run)},WAIT)}
+  /* espera 1 s mostrando o dia 1; mesmo se deslizar, o efeito acontece (só trocar de aba cancela) */
+  requestAnimationFrame(()=>{L.scrollTop=from});let off=false;
+  const busy=()=>$('#modal').classList.contains('on')||(($('#addmenu')||{}).style||{}).display==='block'||!!document.querySelector('#msheet .mov')||document.hidden;
+  const go=()=>{if(off||id!==MRAT)return;if(view!=='saldos')return;if(busy()){setTimeout(go,150);return}from=L.scrollTop;requestAnimationFrame(run)};
+  /* se abrir o + ou outra janela na espera, o efeito espera fechar e acontece em seguida */
+  setTimeout(go,WAIT)}
 document.addEventListener('click',e=>{const b=e.target.closest&&e.target.closest('[data-a="hoje"]');if(b&&MOB)MANIM=(view==='saldos')?'cur':'top';
   const s=e.target.closest&&e.target.closest('#mnav [data-v="saldos"]');if(s&&MOB&&view!=='saldos'){const n=new Date();MM=new Date(n.getFullYear(),n.getMonth(),1,12);MPEND=true;MANIM='top'}},true);
 
