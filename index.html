@@ -1361,7 +1361,7 @@ $('#scroll').addEventListener('wheel',e=>{const m=e.target.closest('.mes');if(m&
 window.addEventListener('resize',()=>{if(view==='saldos')setupScroll(($('#vs')||{}).scrollTop||0)});
 
 /* ===================== layout de celular ===================== */
-var MOB=false,MM=new Date(new Date().getFullYear(),new Date().getMonth(),1,12),MF='all',MPEND=true,DPSEL=null,HOWO=false;
+var MANIM='top',MRAT=0,MOB=false,MM=new Date(new Date().getFullYear(),new Date().getMonth(),1,12),MF='all',MPEND=true,DPSEL=null,HOWO=false;
 var MQ=window.matchMedia?matchMedia('(max-width:700px)'):{matches:false};
 function setMob(){MOB=!!MQ.matches;document.body.classList.toggle('mob',MOB);mnavSync();refresh();if(MOB&&view==='saldos')mobHoje()}
 if(MQ.addEventListener)MQ.addEventListener('change',setMob);else if(MQ.addListener)MQ.addListener(setMob);
@@ -1392,7 +1392,7 @@ function renderMob(){
       return `<div class="mmv ${x?'has':''}" data-a="mday" data-k="${k}" data-c="${i}">${icn}<span>${brl(x)}</span></div>`}).join('');
     h+=`<div class="mday${k===today?' hj':''}"><div class="mdn ${k===today?'hoje':dt.getDay()%6===0?'wk':''}${S.marks&&S.marks[k]?' mk':''}" data-a="mark" data-d="${k}">${d}</div><div>${rows}</div><div class="msal ${band(bal)}" data-a="mday" data-k="${k}" data-c="all">${brl(bal)}</div></div>`}
   const L=$('#mlist'),st=L.scrollTop;L.innerHTML=h+'<div style="height:30px"></div>';
-  if(MPEND){MPEND=false;mobScrollHoje();requestAnimationFrame(mobScrollHoje);setTimeout(mobScrollHoje,350)}else L.scrollTop=st}
+  if(MPEND){MPEND=false;const an=MANIM;MANIM=null;if(an&&MOB)mobRatchet(an==='top'?0:st,an==='top'?1000:0);else{mobScrollHoje();requestAnimationFrame(mobScrollHoje);setTimeout(mobScrollHoje,350)}}else L.scrollTop=st}
 function mobScrollHoje(){const L=$('#mlist');if(!L)return;const e=L.querySelector('.mday.hj');if(!e){L.scrollTop=0;return}L.scrollTop+=e.getBoundingClientRect().top-L.getBoundingClientRect().top}
 function mobHoje(){MPEND=true;if(view==='saldos')renderMob()}
 function msheet(h){$('#msheet').innerHTML=`<div class="mov" data-a="mshx"><div class="msh" data-a="noop">${h}</div></div>`}
@@ -1447,7 +1447,7 @@ function PLM(i){return MOB&&i===4?'cartão':PL[i]}
 function mobSwipe(dir){const i0=MSEQ.indexOf(MF),i=Math.max(0,Math.min(MSEQ.length-1,i0+dir));if(i===i0)return;MF=MSEQ[i];const L=$('#mlist'),lt=L.getBoundingClientRect().top;let ak=null,off=0;for(const r of L.querySelectorAll('.mday')){const b=r.getBoundingClientRect();if(b.bottom>lt+1){ak=r.querySelector('.mdn').dataset.d;off=b.top-lt;break}}renderMob();const n=ak&&L.querySelector('.mdn[data-d="'+ak+'"]');if(n){const r=n.parentNode;L.scrollTop+=r.getBoundingClientRect().top-L.getBoundingClientRect().top-Math.max(off,-r.offsetHeight+1)}L.classList.remove('swl','swr');void L.offsetWidth;L.classList.add(dir>0?'swl':'swr')}
 
 /* ao abrir/voltar ao app, a data de hoje fica na primeira linha */
-document.addEventListener('visibilitychange',()=>{if(document.hidden||!MOB)return;const n=new Date();MM=new Date(n.getFullYear(),n.getMonth(),1,12);MPEND=true;if(view==='saldos')renderMob()});
+document.addEventListener('visibilitychange',()=>{if(document.hidden||!MOB)return;const n=new Date();MM=new Date(n.getFullYear(),n.getMonth(),1,12);MPEND=true;MANIM='top';if(view==='saldos')renderMob()});
 /* diário médio: diários lançados até hoje ÷ dia de hoje (meses passados: ÷ dias do mês) */
 function dmVal(y,m){const ym=y+'-'+pad(m+1),dias=new Date(y,m+1,0).getDate(),cur=ym===today.slice(0,7),X=XD.d||{};let s=0;
   Object.keys(DAY).forEach(k=>{if(k.slice(0,7)===ym&&(!cur||k<=today))s+=DAY[k][2]-((X[k]||[])[2]||0)});
@@ -1793,6 +1793,30 @@ function centerHoje(){if(MOB)return;HJW=Date.now()+4000;const go=()=>{if(!MOB&&v
   document.addEventListener('click',e=>{const b=e.target.closest&&e.target.closest('[data-v="saldos"]');if(b&&!MOB)setTimeout(centerHoje,0)},true);
 })();
 window.addEventListener('load',centerHoje);setTimeout(centerHoje,300);document.addEventListener('visibilitychange',()=>{if(!document.hidden)centerHoje()});
+
+
+/* celular: efeito catraca até a data de hoje.
+   abrir o app ou tocar no calendário de outra tela: começa no dia 1 e desce dia a dia até hoje em 5 segundos;
+   tocar no calendário estando nos saldos: sai de onde está (sobe ou desce) até hoje */
+function mobRatchet(from,WAIT){
+  const L=$('#mlist');if(!L)return;const id=++MRAT;
+  const run=()=>{if(id!==MRAT)return;const e=L.querySelector('.mday.hj');if(!e){mobScrollHoje();return}
+    L.scrollTop=from;const lt=L.getBoundingClientRect().top,base=L.scrollTop;
+    const max=L.scrollHeight-L.clientHeight;let target=Math.max(0,Math.min(max,base+e.getBoundingClientRect().top-lt));
+    const tops=[...L.querySelectorAll('.mday')].map(r=>base+r.getBoundingClientRect().top-lt).filter(t=>t>=Math.min(from,target)-1&&t<=Math.max(from,target)+1);
+    const dist=Math.abs(target-from);if(dist<2){L.scrollTop=target;return}
+    const dur=WAIT?1000:Math.min(800,300+tops.length*25),t0=performance.now(),ease=t=>1-Math.pow(1-t,3);
+    let stop=false;const cancel=()=>{stop=true};L.addEventListener('touchstart',cancel,{once:true,passive:true});L.addEventListener('wheel',cancel,{once:true,passive:true});
+    const step=now=>{if(stop||id!==MRAT)return;const t=Math.min(1,(now-t0)/dur),p=from+(target-from)*ease(t);
+      let snap=p;if(t<1&&tops.length){snap=tops.reduce((a,b)=>Math.abs(b-p)<Math.abs(a-p)?b:a)}
+      L.scrollTop=t<1?snap:target;if(t<1)requestAnimationFrame(step)};
+    requestAnimationFrame(step)};
+  if(!WAIT){requestAnimationFrame(()=>requestAnimationFrame(run));return}
+  /* espera 1 s mostrando o dia 1; tocar na lista ou trocar de aba cancela */
+  requestAnimationFrame(()=>{L.scrollTop=from});let off=false;const c=()=>{off=true};L.addEventListener('touchstart',c,{once:true,passive:true});L.addEventListener('wheel',c,{once:true,passive:true});
+  setTimeout(()=>{if(off||id!==MRAT||view!=='saldos')return;requestAnimationFrame(run)},WAIT)}
+document.addEventListener('click',e=>{const b=e.target.closest&&e.target.closest('[data-a="hoje"]');if(b&&MOB)MANIM=(view==='saldos')?'cur':'top';
+  const s=e.target.closest&&e.target.closest('#mnav [data-v="saldos"]');if(s&&MOB&&view!=='saldos'){const n=new Date();MM=new Date(n.getFullYear(),n.getMonth(),1,12);MPEND=true;MANIM='top'}},true);
 
 startFor();grid();
 scrollHoje();
